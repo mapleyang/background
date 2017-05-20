@@ -19,25 +19,29 @@ class Login extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        sessionStorage.setItem("userInfo", values)
-        fetch("/login?userName=" + values.userName + "&password=" + values.password)
-        .then(response => response.json())
-        .then(json => { 
-          if(json.success) {
-            json.user.forEach(el => {
-              if(el.userName === values.userName && el.password === values.password) {
-                console.log("login success")
-                sessions.setItem("userInfo", values)
-              }
-            })
+        var body = {
+          userName: values.userName,
+          password: values.password,
+        }
+        window.$.ajax({
+          type: 'post',
+          url: "/chealth/background/ajaxBusiness/saveMember",
+          data: body,
+          dataType:'html',
+          success:function(res){
+            console.log('success')   
+            location.hash = "/home"                  
+          },
+          error:function(){
+            console.log("error")
           }
-        })
+        });
       }
     });
   }
 
   registerClick () {
-    location.hash = '/register';
+    // location.hash = '/register';
   }
 
 

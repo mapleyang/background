@@ -34,8 +34,8 @@ webpackConfig.entry = {
 }
 
 webpackConfig.output = {
-  filename: `js/[name].[${config.compiler_hash_type}].js`,
-  chunkFilename: 'js/[name].[chunkhash].js',
+  filename: `js/[name].js`,
+  chunkFilename: 'js/[name].js',
   path: paths.dist(),
   publicPath: config.compiler_public_path
 }

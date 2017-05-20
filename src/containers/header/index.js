@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Row, Col, Menu, Icon  } from 'antd'
 import { addLocaleData, IntlProvider, FormattedMessage } from 'react-intl';
-import './index.scss'
+import './index.scss';
+import HeaderMenu from "../../contents/header";
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
@@ -11,10 +12,15 @@ class Header extends Component {
   constructor(props, context) {
     super(props)
     this.state = {
-      current: 'mail',
+      current: 'group',
       language: languageValue,
       param: "",
     }
+  }
+
+  componentWillMount () {
+    //获取到header项目
+    //获取用户信息
   }
 
   componentDidMount () {
@@ -25,11 +31,11 @@ class Header extends Component {
   }
 
   handleClick = (e) => {
-    console.log('click ', e);
     this.setState({
       current: e.key,
     });
-    location.hash = "/" + e.key;
+    this.props.setModle(e.key)
+    // location.hash = "/" + e.key;
   }
 
   loginClick () {
@@ -74,65 +80,42 @@ class Header extends Component {
     location.hash = "/user";
   }
 
+  getMenuList () {
+    let item = "";
+    item = HeaderMenu["adminMenu"].map(el => {
+      return <Menu.Item key={el.value}>
+        <span>
+          {el.label}
+        </span>
+      </Menu.Item>
+    })
+    return item;
+  }
+
+  getMenu () {
+
+  }
+
   render() {
     const defaultZH_EN = window.ZH_EN['zh'];
     let param = location.hash.slice(2, 4) === "en" ? "en" : "zh";
     if(this.state.param !== "" && this.state.param !== param ) {
       location.reload();
     }
-    console.log("sessionStorage:" + sessionStorage.getItem("userInfo"))
     return (
       <div className="header-area">
         <Row className="header-row-menu">
-          <Col span={4} className="header-logo">
-            <img src="./viewfile.png" />
-            <div className="header-name"><span>戒烟-健康之路</span></div>
+          <Col span={3} className="header-logo">
+            <img src="/chealth/img/background/viewfile.png" />
+            <div className="header-name"><span>电商配置</span></div>
           </Col>
-          <Col span={16} className="menu-col">
+          <Col span={17} className="menu-col">
               <Menu
               onClick={this.handleClick}
               selectedKeys={[this.state.current]}
-              mode="horizontal"
-            >
-              <Menu.Item key="home">
-                <span>
-                  <FormattedMessage id="header.menu.home" defaultMessage={defaultZH_EN['header.menu.home']}/>
-                </span>
-              </Menu.Item>
-              <SubMenu title={<span><FormattedMessage id="header.menu.active" defaultMessage={defaultZH_EN['header.menu.active']}/></span>}>
-                <Menu.Item key="analysis">戒烟健康分析</Menu.Item>
-                <Menu.Item key="share">分享&解答</Menu.Item>
-                <Menu.Item key="coach">戒烟教练</Menu.Item>
-                <Menu.Item key="child">孩子-无烟</Menu.Item>
-              </SubMenu>
-              <SubMenu title={<span><FormattedMessage id="header.menu.project" defaultMessage={defaultZH_EN['header.menu.project']}/></span>}>
-                <Menu.Item key="selfcure">自助戒烟</Menu.Item>
-                <Menu.Item key="msgcure">短信戒烟</Menu.Item>
-                <Menu.Item key="mindcure">心理戒烟</Menu.Item>
-                <Menu.Item key="medicinecure">药物戒烟</Menu.Item>
-                <Menu.Item key="medicinecure">诊所戒烟</Menu.Item>
-              </SubMenu>
-              <Menu.Item key="mark">
-                <FormattedMessage id="header.menu.mark" defaultMessage={defaultZH_EN['header.menu.mark']}/>
-              </Menu.Item>
-              <SubMenu title={<span><FormattedMessage id="header.menu.mine" defaultMessage={defaultZH_EN['header.menu.mine']}/></span>}>
-                <Menu.Item key="calendar">戒烟日历</Menu.Item>
-                <Menu.Item key="myplan">戒烟计划</Menu.Item>
-                <Menu.Item key="diary">戒烟日记</Menu.Item>
-                <Menu.Item key="result">戒烟成果</Menu.Item>
-                <Menu.Item key="health">我的健康</Menu.Item>
-                <Menu.Item key="commonweal">戒烟公益</Menu.Item>
-              </SubMenu>
-              <SubMenu title={<span><FormattedMessage id="header.menu.knowledge" defaultMessage={defaultZH_EN['header.menu.knowledge']}/></span>}>
-                <Menu.Item key="disease">烟草-癌症和健康</Menu.Item>
-                <Menu.Item key="truth">戒烟-神话和真相</Menu.Item>
-                <Menu.Item key="compete">戒烟-知识竞赛</Menu.Item>
-              </SubMenu>
-              <SubMenu title={<span><FormattedMessage id="header.menu.more" defaultMessage={defaultZH_EN['header.menu.more']}/></span>}> 
-                <Menu.Item key="harm">吸烟危害</Menu.Item>
-                <Menu.Item key="twiceharm">二手烟危害</Menu.Item>
-              </SubMenu>
-            </Menu>
+              mode="horizontal">
+                {this.getMenuList()}
+              </Menu>
           </Col>
           <Col span={2}>
             {this.getUserItem()}
@@ -147,3 +130,21 @@ class Header extends Component {
 }
 
 export default Header;
+
+
+
+// <Menu.Item key="group">
+//                 <span>
+//                   <FormattedMessage id="header.menu.group" defaultMessage={defaultZH_EN['header.menu.group']}/>
+//                 </span>
+//               </Menu.Item>
+//               <Menu.Item key="base">
+//                 <span>
+//                   <FormattedMessage id="header.menu.base" defaultMessage={defaultZH_EN['header.menu.base']}/>
+//                 </span>
+//               </Menu.Item>
+//               <Menu.Item key="analysis">
+//                 <span>
+//                   <FormattedMessage id="header.menu.analysis" defaultMessage={defaultZH_EN['header.menu.analysis']}/>
+//                 </span>
+//               </Menu.Item>

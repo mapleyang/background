@@ -4,6 +4,43 @@ html , body {
 .main {
   height: 100%;
   .main-content {
-    height: 100%;
+    height: inherit;
+    .main-left-content {
+      float: left;
+      width: 170px;
+      height: 100%;
+      .left-menu {
+        margin-top: 50px;
+      }
+    }
+    .main-right-content {
+      margin-left: 170px;
+      height: 100%;
+      overflow-y: auto;
+      border-left: 1px #eee solid;
+      padding-top: 50px;
+      .right-content {
+        margin: 10px;
+        height: inherit;
+      }
+    }
+  }
+  .main-header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1200;
+  }
+  .line-area {
+    border-bottom: 1px #eee solid;
+    width: 96%;
+    position: relative;
+    left: 2%;
+    margin: 20px 0;
+  }
+}
+.table-operate {
+  .table-operate-item {
+    margin-left: 10px;
   }
 }
