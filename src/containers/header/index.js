@@ -21,6 +21,9 @@ class Header extends Component {
   componentWillMount () {
     //获取到header项目
     //获取用户信息
+    if(!sessionStorage.getItem("userInfo")) {
+      location.hash = "/login"
+    }
   }
 
   componentDidMount () {
@@ -71,7 +74,7 @@ class Header extends Component {
       item = <div className="user-login" onClick={this.loginClick.bind(this)}><Icon type="user" />登陆/注册</div>
     }
     else {
-      item = <div className="user-image" onClick={this.userInfoClick.bind(this)}><img src="./user.jpg" /></div>
+      item = <div className="user-image" onClick={this.userInfoClick.bind(this)}><img src="/chealth/img/background/user.jpg" /></div>
     }
     return item;
   }

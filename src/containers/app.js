@@ -15,16 +15,22 @@ export default class App extends Component {
     }
   }
 
+  componentWillMount () {
+    if(!sessionStorage.getItem("userInfo")) {
+      location.hash = "/login"
+    }
+  }
+
   getHeader () {
     let header = "";
-    let flag = location.hash.indexOf("#/mobile");
-    let pathname = "";
-    if(flag === 0) {
-      pathname = "mobile";
-    }
-    else {
-      header = <Header setModle={this.setModle.bind(this)} />
-    }
+    header = <Header setModle={this.setModle.bind(this)} />
+    // let flag = location.hash.indexOf("#/mobile");
+    // let pathname = "";
+    // if(flag === 0) {
+    //   pathname = "mobile";
+    // }
+    // else {
+    // }
     return header;
   }
 
@@ -36,8 +42,8 @@ export default class App extends Component {
 
   getLeftArea () {
     let item;
-    if(!PathName.getPathName("#/login")) {
-      item = <div>
+    if(PathName.getPathName("#/login") || PathName.getPathName("#/home")) {
+      item = <div className="main-full-content">
         {this.props.children}
       </div>
     }

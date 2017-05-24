@@ -12,10 +12,13 @@ import ZH_EN from './zh-en';
 
 import { hashHistory, browserHistory, Router, Route, IndexRoute, IndexRedirect } from 'react-router'
 import 'antd/dist/antd.less'
+import Test from "./containers/test"
 import App from "./containers/app"
 import Home from "./containers/home/index"
 import Login from "./containers/login/index"
 import GroupUser from "./containers/group/user"
+import Project from "./containers/project/index"
+import Clubber from "./containers/customer/clubber"
 
 window.$ = $;
 
@@ -56,12 +59,17 @@ const ready = () => {
           <Route path="/" component={App}>
             <IndexRoute component={Home}/>
             <IndexRedirect to="/home" />
+            <Route path="/test" component={Test}></Route>
             <Route path="/home" component={Home}></Route>
             <Route path="/en/home" component={Home}></Route>
             <Route path="/login" component={Login}></Route>
             <Route path="/en/login" component={Login}></Route>
             <Route path="/group_user" component={GroupUser}></Route>
             <Route path="/en/group_user" component={GroupUser}></Route>
+            <Route path="/project" component={Project}></Route>
+            <Route path="/en/project" component={Project}></Route>
+            <Route path="/Clubber" component={Clubber}></Route>
+            <Route path="/en/Clubber" component={Clubber}></Route>
           </Route>
         </Router>
       </IntlProvider>

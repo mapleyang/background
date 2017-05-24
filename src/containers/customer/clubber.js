@@ -54,10 +54,15 @@ const data = [{
     operate: ["查看", "删除"]
   }];
 
-class Group extends Component {
+class Clubber extends Component {
   constructor(props, context) {
     super(props)
     this.state = {}
+  }
+
+  componentWillMount () {
+    //项目接口
+    //会员信息接口
   }
 
   handleChange (value) {
@@ -72,7 +77,7 @@ class Group extends Component {
         <div className="group-user">
           <div className="group-search">
             <div className="group-search-select">
-              <span>团体客户名称：</span>
+              <span>项目名称：</span>
               <Select defaultValue="lucy" style={{ width: 200 }} onChange={this.handleChange.bind(this)}>
                 <Option value="jack">Jack</Option>
                 <Option value="lucy">Lucy</Option>
@@ -97,5 +102,5 @@ class Group extends Component {
   }
 }
 
-export default Group = Form.create({
-})(Group);
+export default Clubber = Form.create({
+})(Clubber);

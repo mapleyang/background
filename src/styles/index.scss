@@ -3,6 +3,9 @@ html , body {
 }
 .main {
   height: 100%;
+  .main-full-content {
+    height: inherit;
+  }
   .main-content {
     height: inherit;
     .main-left-content {
@@ -37,6 +40,11 @@ html , body {
     position: relative;
     left: 2%;
     margin: 20px 0;
+  }
+  .footer {
+    position: fixed;
+    bottom: 0;
+    z-index: 1200;
   }
 }
 .table-operate {

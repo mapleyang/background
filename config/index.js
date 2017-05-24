@@ -41,14 +41,7 @@ const config = {
   ],
   //Proxy Configuration -> path: host
   proxyTable: {
-    '/movie/coming': 'http://localhost:9000',
-    '/movie/hot': 'http://localhost:9000',
-    '/movie/info': 'http://localhost:9000',
-    '/movie/evaluation': 'http://localhost:9000',
-    '/movie/cinema': 'http://localhost:9000',
-    '/movie/cinema_detail': 'http://localhost:9000',
-    '/movie/swiper': 'http://localhost:9000',
-    '/movie/city': 'http://localhost:9000'
+    '/chealth/*': 'http://localhost:8080',
   },
 
   // ----------------------------------

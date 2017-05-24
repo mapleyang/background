@@ -20,20 +20,24 @@ class Login extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         var body = {
-          userName: values.userName,
+          email: values.userName,
           password: values.password,
         }
         window.$.ajax({
-          type: 'post',
-          url: "/chealth/background/ajaxBusiness/saveMember",
+          type: 'POST',
+          url: "/chealth/background/login/login",
           data: body,
           dataType:'html',
           success:function(res){
-            console.log('success')   
-            location.hash = "/home"                  
+            if(success) {
+              sessionStorage.setItem("userInfo", res)
+              location.hash = "/home"                  
+            }
+            else {
+              
+            }
           },
           error:function(){
-            console.log("error")
           }
         });
       }
@@ -50,7 +54,6 @@ class Login extends Component {
     return (
       <div className="login">
         <div className="login-content">
-          <img src="./quitsmoking.png" />
           <div className="login-area">
              <Form onSubmit={this.handleSubmit} className="login-form">
               <FormItem>

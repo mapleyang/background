@@ -1,17 +1,19 @@
 const MenuList = {
   group: [{
-    key: "group",
+    key: "channels",
     icon: "appstore",
-    title: "用户管理",
-    children: [{
-      key: "group_user",
-      icon: "",
-      title: "团体用户"
-    },{
-      key: "group_channels",
-      icon: "",
-      title: "渠道用户"
-    }]
+    title: "渠道用户",
+    children: []
+  },{
+    key: "ghmanager",
+    icon: "appstore",
+    title: "GH 管理员",
+    children: []
+  },{
+    key: "ghassist",
+    icon: "appstore",
+    title: "GH 客服管理",
+    children: []
   }],
   base: [{
     key: "base_physical",
@@ -48,7 +50,29 @@ const MenuList = {
     key: "analysis_service",
     icon: "appstore",
     title: "服务分析"
-  }]
+  }],
+  project: [{
+    key: "project",
+    icon: "appstore",
+    title: "项目管理"
+  }],
+  customerService: [{
+    key: "clubber",
+    icon: "appstore",
+    title: "会员信息"
+  },{
+    key: "reserve",
+    icon: "appstore",
+    title: "预约改约"
+  },{
+    key: "export",
+    icon: "appstore",
+    title: "预约导出"
+  },{
+    key: "export",
+    icon: "appstore",
+    title: "排期和名额"
+  }],
 }
 
 export default MenuList;

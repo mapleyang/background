@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Spin, message, Form, Icon, Input, Button, Row, Col, Radio, Carousel  } from 'antd'
+import { Spin, message, Form, Icon, Input, Button, Row, Col, Radio, Carousel, Card   } from 'antd'
 import './index.scss'
 import Footer from '../footer/index';
 import classnames from "classnames";
@@ -20,6 +20,10 @@ class Home extends Component {
       current: 'mail',
       hoverFlag: "",
     }
+  }
+
+  componentWillMount () {
+
   }
 
   componentDidMount () {
@@ -54,110 +58,6 @@ class Home extends Component {
     }, 500)
   }
 
-  getContent (value) {
-    let item = "";
-    const mainContent = [{
-      name: "q",
-      value: <Col className="home-fuc-entry-content" span={20}>
-        <Row>
-          <Col span={6}>
-            <div className="entry-content-title">i want quit</div>
-          </Col>
-          <Col span={14}>
-            <Row>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "analysis")}>健康分析</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "myplan")}>戒烟计划</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "mark")}>戒烟打卡</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "diary")}>戒烟日记</div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    },{
-      name: "u",
-      value: <Col className="home-fuc-entry-content" span={20}>
-        <Row>
-          <Col span={6}>
-            <div className="entry-content-title">Recently quit</div>
-          </Col>
-          <Col span={14}>
-            <Row>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "selfcure")}>自助戒烟</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "msgcure")}>短信戒烟</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "mindcure")}>心理戒烟</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "medicinecure")}>药物戒烟</div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    },{
-      name: "i",
-      value: <Col className="home-fuc-entry-content" span={20}>
-        <Row>
-          <Col span={6}>
-            <div className="entry-content-title">Stay quit</div>
-          </Col>
-          <Col span={14}>
-            <Row>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "truth")}>戒烟游戏</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "compete")}>戒烟知识竞赛</div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    },{
-      name: "t",
-      value: <Col className="home-fuc-entry-content" span={20}>
-        <Row>
-          <Col span={6}>
-            <div className="entry-content-title">Smoke-free World</div>
-          </Col>
-          <Col span={14}>
-            <Row>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "disease")}>戒烟知识</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "commonweal")}>戒烟公益</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "coach")}>戒烟教练</div>
-              </Col>
-              <Col span={6}>
-                <div className="entry-content-title" onClick={this.linkClick.bind(this, "child")}>孩子-无烟</div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    }]
-    mainContent.forEach(el => {
-      if(el.name === this.state.hoverFlag && el.name === value) {
-        item = el.value;
-      }
-    })
-    return item;
-  }
 
   mouseLeave () {
     $("#desc").css("z-index", 1000)
@@ -170,11 +70,30 @@ class Home extends Component {
     location.hash = "/" + value;
   }
 
+  getModle () {
+    let item;
+    let array = ["医疗协同","体检预约","权限管理",4,5,6];
+    item = array.map((el,index) => {
+      return <Col key={"modle" + index} span={4} className="home-modles-block">
+        <Card onClick={this.cardModleClick.bind(el)}>
+          {el}
+        </Card>
+      </Col>
+    })
+    return item;
+  }
+
+  cardModleClick (value) {
+    location.hash = "/login"
+  }
+
   render() {
     const defaultZH_EN = window.ZH_EN[language.getLanguage()];
     return (
       <div className="home">
-        test
+        <div className="home-modles">
+          <Row>{this.getModle()}</Row>
+        </div>
       </div>
     );
   }

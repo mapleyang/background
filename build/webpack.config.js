@@ -21,7 +21,7 @@ const webpackConfig = {
     extensions: ['', '.web.js', '.js', '.jsx', '.json']
   },
   module: {},
-  postcss: []
+  postcss: [],
 }
 
 const APP_ENTRY = paths.client('main.js')
@@ -34,9 +34,12 @@ webpackConfig.entry = {
 }
 
 webpackConfig.output = {
-  filename: `js/[name].js`,
-  chunkFilename: 'js/[name].js',
-  path: paths.dist(),
+  // filename: `js/[name].js`,
+  filename: `js/background/[name].js`,
+  chunkFilename: 'js/background/[name].js',
+  // chunkFilename: 'js/[name].js',
+  path: "D:/Development/workspace/chealth/WebContent/",
+  // path: paths.dist(),
   publicPath: config.compiler_public_path
 }
 
@@ -57,7 +60,7 @@ webpackConfig.plugins = [
   new HtmlWebpackPlugin({
     template: paths.client('index.html'),
     hash: false,
-    favicon: paths.client('static/favicon.ico'),
+    // favicon: paths.client('static/favicon.ico'),
     filename: viewName,
     inject: 'body',
     minify: {
@@ -182,7 +185,8 @@ if (!__DEV__) {
   })
 
   webpackConfig.plugins.push(
-    new ExtractTextPlugin('css/[contenthash].css', {
+    // new ExtractTextPlugin('css/[contenthash].css', {
+    new ExtractTextPlugin('css/background/app.css', {
       allChunks: true
     })
   )

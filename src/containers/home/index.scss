@@ -1,110 +1,17 @@
 .home {
-  .home-main-desc {
-    height: 350px;
-    position: fixed;
-    right: 0;
-    z-index: 1000;
-    .home-main-detail {
-      width: 400px;
-      height: 240px;
-      float: right;
-      background: #EBDDC0;
-      margin-top: 50px;
-      opacity: 0.8;
-      margin-right: 180px;
-      border-radius: 5px;
-      .home-main-desc-title {
-        font-weight: bold;
-        font-size: 22px;
-        padding-left: 10px;
-      }
-      .home-main-desc-content {
-        padding-left: 10px;
-        line-height: 30px;
-      }
-    }
-    .home-create-health {
-      padding: 20px 10px;
-      span {
-        border: 1px solid #0c5b79;
-        padding: 6px 20px;
-        background: #0c5b79;
-        color: #fff;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-    }
-  }
-  .home-entry-list {
-    position: fixed;
-    z-index: 100;
-    width: 100%;
-    top: 240px;
-    .home-fuc-entry {
-      height: 100px;
-      width: 100px;
-      opacity: 0.8;
-      overflow: hidden;
-      transition: width 2s;
-      background: #EBDDC0;
-      .home-fuc-entry-flag {
-        height: 100px;
-        width: 100px;
-        font-size: 40px;
-        line-height: 100px;
-        text-align: center;
-      }
-      .home-fuc-entry-content {
-        .entry-content-title {
-          font-size: 24px;
+  position: relative;
+  top: 50px;
+  .home-modles {
+    position: relative;
+    top: 100px;
+    .home-modles-block {
+      height: 200px;
+      padding: 20px;
+      .ant-card {
+        height: 100%;
+        .ant-card-body {
           text-align: center;
-          line-height: 100px;
-          cursor: pointer;
         }
-      }
-    }
-    .home-fuc-entry:hover {
-      width: 100%;
-    }
-  }
-  .home-main-area {
-    height: 550px;
-    width: 100%;
-  }
-  .home-main-data {
-    height: 550px;
-    width: 100%;
-    .home-main-data-desc {
-      height: 350px;
-      .data-desc-content {
-        height: 150px;
-        position: relative;
-        background: #0c5b79;
-        position: relative;
-        top: 200px;
-        text-align: center;
-        line-height: 150px;
-        color: #fff;
-        font-size: 20px;
-      }
-    }
-    .home-main-data-list {
-      height: 140px;
-      background-color: rgba(195,191,185,.5);
-      .data-list-img {
-        width: 100%;
-        height: 100px;
-        text-align: center;
-        img {
-          height: 80px;
-          margin-top: 10px;
-        }
-      }
-      .data-list-img-desc {
-        text-align: center;
-        height: 40px;
-        line-height: 40px;
-        font-weight: bold;
       }
     }
   }
