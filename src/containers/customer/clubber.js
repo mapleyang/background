@@ -68,8 +68,6 @@ class Clubber extends Component {
   handleChange (value) {
     console.log(value)
   }
-
-
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
