@@ -5,6 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const config = require('../config')
 const pxtorem = require('postcss-pxtorem')
 const debug = require('debug')('app:webpack:config')
+const fs = require('fs')
 
 const paths = config.utils_paths
 const __DEV__ = config.globals.__DEV__
@@ -22,6 +23,29 @@ const webpackConfig = {
   },
   module: {},
   postcss: [],
+}
+
+if (!__DEV__) {
+  fs.unlink('D:/Development/workspace/chealth/WebContent/js/background/app.js', function (err) {
+      if (err){
+        console.log(err);
+      } 
+      console.log('文件删除成功');
+  })
+
+  fs.unlink('D:/Development/workspace/chealth/WebContent/js/background/vendor.js', function (err) {
+      if (err){
+        console.log(err);
+      } 
+      console.log('文件删除成功');
+  })
+
+  fs.unlink('D:/Development/workspace/chealth/WebContent/css/background/app.css', function (err) {
+      if (err){
+        console.log(err);
+      } 
+      console.log('文件删除成功');
+  })
 }
 
 const APP_ENTRY = paths.client('main.js')

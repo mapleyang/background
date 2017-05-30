@@ -19,6 +19,10 @@ import Login from "./containers/login/index"
 import GroupUser from "./containers/group/user"
 import Project from "./containers/project/index"
 import Clubber from "./containers/customer/clubber"
+import ClubberLogin from "./containers/customer/clubberLogin"
+import Reserve from "./containers/customer/reserve"
+import OrgResImport from "./containers/customer/orgResImport"
+import OrgResChange from "./containers/customer/orgResChange"
 
 window.$ = $;
 
@@ -70,6 +74,10 @@ const ready = () => {
             <Route path="/en/project" component={Project}></Route>
             <Route path="/Clubber" component={Clubber}></Route>
             <Route path="/en/Clubber" component={Clubber}></Route>
+            <Route path="/clubberlogin" component={ClubberLogin}></Route>
+            <Route path="/reserve" component={Reserve}></Route>
+            <Route path="/orgreschange" component={OrgResChange}></Route>
+            <Route path="/orgresimport" component={OrgResImport}></Route>
           </Route>
         </Router>
       </IntlProvider>

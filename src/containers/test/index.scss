@@ -9,14 +9,14 @@
       left: 200px;
     }
   }
-  .login-area {
+  .test-area {
     float: right;
     position: relative;
-    width: 50%;
+    width: 60%;
     top: 100px;
     padding-left: 150px;
     form {
-      width: 50%;
+      width: 90%;
       .login-form {
         max-width: 300px;
       }
@@ -32,5 +32,8 @@
     margin-left: 50px;
     margin-top: 100px;
     float: left;
+  }
+  .data-area {
+    height: 200px;
   }
 }

@@ -49,7 +49,7 @@ class Footer extends Component {
             <div><a>使用条款</a></div>
           </Col>
           <Col span={8}>
-            <div className="code-img"><img src="./code.png" /></div>
+            <div className="code-img"><img src="/chealth/img/background/code.png" /></div>
             <div className="code-img">微信公众号：GravityHealth2015</div>
           </Col>
         </Row>

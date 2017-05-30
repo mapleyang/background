@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Spin, message, Form, Icon, Input, Button, Row, Col, Radio, Carousel, Checkbox  } from 'antd'
+import { Spin, message, Form, Icon, Input, Button, Row, Col, Radio, Carousel, Checkbox, Modal  } from 'antd'
 import './index.scss'
 import Footer from '../footer/index';
 const FormItem = Form.Item
@@ -12,11 +12,14 @@ const formItemLayout = {
 class Login extends Component {
 	constructor(props, context) {
     super(props)
-    this.state = {}
+    this.state = {
+      error: ""
+    }
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const _this = this;
     this.props.form.validateFields((err, values) => {
       if (!err) {
         var body = {
@@ -29,12 +32,16 @@ class Login extends Component {
           data: body,
           dataType:'html',
           success:function(res){
-            if(success) {
+            let data = JSON.parse(res)
+            if(data.success === "true") {
               sessionStorage.setItem("userInfo", res)
-              location.hash = "/home"                  
+              location.hash = "/clubber"                  
             }
             else {
-              
+              Modal.error({
+                title: data.errors[0].errorMessage,
+                content: '',
+              });
             }
           },
           error:function(){
@@ -42,10 +49,6 @@ class Login extends Component {
         });
       }
     });
-  }
-
-  registerClick () {
-    // location.hash = '/register';
   }
 
 
@@ -71,17 +74,9 @@ class Login extends Component {
                 )}
               </FormItem>
               <FormItem>
-                {getFieldDecorator('remember', {
-                  valuePropName: 'checked',
-                  initialValue: true,
-                })(
-                  <Checkbox>Remember me</Checkbox>
-                )}
-                <a className="login-form-forgot">Forgot password</a>
                 <Button type="primary" htmlType="submit" className="login-form-button">
                   Log in
                 </Button>
-                Or <a onClick={this.registerClick.bind(this)}>register now!</a>
               </FormItem>
             </Form>
           </div>

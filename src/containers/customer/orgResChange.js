@@ -40,7 +40,7 @@ const options = [{
 }];
 
 
-class ClubberLogin extends Component {
+class OrgResChange extends Component {
   constructor(props, context) {
     super(props)
     this.state = {
@@ -57,7 +57,7 @@ class ClubberLogin extends Component {
       projectData: [],
       projectValue: "all",
     }
-    this.columns = ClubberDetail.getClubberLoginInfo(this)
+    this.columns = ClubberDetail.getOrgResChangeItem(this)
   }
 
   componentWillMount () {
@@ -681,5 +681,5 @@ class ClubberLogin extends Component {
   }
 }
 
-export default ClubberLogin = Form.create({
-})(ClubberLogin);
+export default OrgResChange = Form.create({
+})(OrgResChange);

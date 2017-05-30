@@ -3,16 +3,38 @@
     width: 96%;
     position: relative;
     left: 2%;
+    .ant-form-item-control {
+      line-height: 30px;
+    }
+    .item-idCard {
+      .ant-select {
+        width: 32%;
+      }
+      input {
+        width: 68%;
+      }
+    }
+  }
+  .group-search-operate {
     .group-search-button {
-      margin-left: 20px;
+      position: relative;
+      left: 2%;
+      width: 96%;
+      button {
+        margin-right: 20px;
+      }
     }
   }
   .group-table {
     width: 96%;
     position: relative;
     left: 2%;
+    margin-bottom: 20px;
     .group-table-operate {
       margin-bottom: 20px;
+    }
+    .table-operate-item {
+      margin-right: 10px;
     }
   }
 }

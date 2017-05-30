@@ -61,17 +61,25 @@ const MenuList = {
     icon: "appstore",
     title: "会员信息"
   },{
+    key: "clubberlogin",
+    icon: "appstore",
+    title: "会员登陆"
+  },{
     key: "reserve",
     icon: "appstore",
     title: "预约改约"
   },{
-    key: "export",
+    key: "reserveexport",
     icon: "appstore",
     title: "预约导出"
   },{
-    key: "export",
+    key: "orgresimport",
     icon: "appstore",
-    title: "排期和名额"
+    title: "排期名额导入"
+  },{
+    key: "orgreschange",
+    icon: "appstore",
+    title: "排期名额修改"
   }],
 }
 

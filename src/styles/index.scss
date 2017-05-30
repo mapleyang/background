@@ -32,7 +32,7 @@ html , body {
     position: fixed;
     width: 100%;
     top: 0;
-    z-index: 1200;
+    z-index: 1000;
   }
   .line-area {
     border-bottom: 1px #eee solid;
@@ -47,8 +47,16 @@ html , body {
     z-index: 1200;
   }
 }
-.table-operate {
-  .table-operate-item {
-    margin-left: 10px;
+.table-dialog-area {
+  .ant-form-item {
+    margin-bottom: 0px;
+  }
+  .ant-row {
+    margin-bottom: 5px;
+  }
+  .table-area-line {
+    border-bottom: 1px #eee solid;
+    margin-bottom: 5px;
+    margin-top: 10px;
   }
 }

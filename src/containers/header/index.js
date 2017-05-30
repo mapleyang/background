@@ -3,6 +3,7 @@ import { Row, Col, Menu, Icon  } from 'antd'
 import { addLocaleData, IntlProvider, FormattedMessage } from 'react-intl';
 import './index.scss';
 import HeaderMenu from "../../contents/header";
+import PathName from '../../utils/location'
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
@@ -12,7 +13,7 @@ class Header extends Component {
   constructor(props, context) {
     super(props)
     this.state = {
-      current: 'group',
+      current: 'customerService',
       language: languageValue,
       param: "",
     }
@@ -45,36 +46,19 @@ class Header extends Component {
     location.hash = "/login";
   }
 
-  languageCovert (value) {
-    let language;
-    let route;
-    if(location.hash.slice(2,4) === "en") {
-      route = location.hash.slice(4, location.hash.indexOf("?"));
-    }
-    else {
-      route = location.hash.slice(1, location.hash.indexOf("?"))
-    }
-    console.log(route)
-    if(value === "EN") {
-      language = "中文";
-      location.hash = "/en" + route;
-    }
-    if(value === "中文") {
-      language = "EN";
-      location.hash = route;
-    }
-    this.setState({
-      language: language
-    })
-  }
-
   getUserItem () {
     let item;
-    if(sessionStorage.getItem("userInfo") === undefined){
-      item = <div className="user-login" onClick={this.loginClick.bind(this)}><Icon type="user" />登陆/注册</div>
+    // if(sessionStorage.getItem("userInfo") === undefined){
+    //   item = <div className="user-login" onClick={this.loginClick.bind(this)}><Icon type="user" />登陆/注册</div>
+    // }
+    // else {
+    //   item = <div className="user-image" onClick={this.userInfoClick.bind(this)}><img src="/chealth/img/background/user.jpg" /></div>
+    // }
+    if(sessionStorage.getItem("userInfo") === undefined || sessionStorage.getItem("userInfo") === null){
+      item = <div className="user-login">帮助文档</div>
     }
     else {
-      item = <div className="user-image" onClick={this.userInfoClick.bind(this)}><img src="/chealth/img/background/user.jpg" /></div>
+      item = "";
     }
     return item;
   }
@@ -85,26 +69,54 @@ class Header extends Component {
 
   getMenuList () {
     let item = "";
-    item = HeaderMenu["adminMenu"].map(el => {
-      return <Menu.Item key={el.value}>
-        <span>
-          {el.label}
-        </span>
-      </Menu.Item>
-    })
+    if(PathName.getPathName("#/login") || PathName.getPathName("#/home")) {
+      item = ""
+    }
+    else {
+      item = HeaderMenu["adminMenu"].map(el => {
+        return <Menu.Item key={el.value}>
+          <span>
+            {el.label}
+          </span>
+        </Menu.Item>
+      })
+    }
     return item;
   }
-
+  /*
+    获取菜单
+  */
   getMenu () {
 
   }
+  /*登出操作*/
+  loginOutClick () {
+    window.$.ajax({
+      type: 'GET',
+      url: "/chealth/background/login/logout",
+      dataType:'html',
+      success:function(res){
+        let data = JSON.parse(res)
+        if(data.success === "true") {
+          sessionStorage.removeItem("userInfo")
+          location.hash = "/login"               
+        }
+        else {
+           
+        }
+      },
+      error:function(){
+      }
+    });
+  }
 
   render() {
-    const defaultZH_EN = window.ZH_EN['zh'];
-    let param = location.hash.slice(2, 4) === "en" ? "en" : "zh";
-    if(this.state.param !== "" && this.state.param !== param ) {
-      location.reload();
-    }
+    // let param = location.hash.slice(2, 4) === "en" ? "en" : "zh";
+    // if(this.state.param !== "" && this.state.param !== param ) {
+    //   location.reload();
+    // }
+    console.log("test")
+    let userInfo = sessionStorage.getItem("userInfo");
     return (
       <div className="header-area">
         <Row className="header-row-menu">
@@ -116,6 +128,7 @@ class Header extends Component {
               <Menu
               onClick={this.handleClick}
               selectedKeys={[this.state.current]}
+              defaultOpenKeys={['customerService']}
               mode="horizontal">
                 {this.getMenuList()}
               </Menu>
@@ -124,7 +137,9 @@ class Header extends Component {
             {this.getUserItem()}
           </Col>
           <Col span={2}>
-            <div className="language-setting" onClick={this.languageCovert.bind(this, this.state.language)}>{this.state.language}</div>
+            {userInfo === undefined || userInfo === null ? "" :
+              <div className="language-setting" onClick={this.loginOutClick.bind(this)}>登出</div>
+            }
           </Col>
         </Row>
       </div>
@@ -134,20 +149,3 @@ class Header extends Component {
 
 export default Header;
 
-
-
-// <Menu.Item key="group">
-//                 <span>
-//                   <FormattedMessage id="header.menu.group" defaultMessage={defaultZH_EN['header.menu.group']}/>
-//                 </span>
-//               </Menu.Item>
-//               <Menu.Item key="base">
-//                 <span>
-//                   <FormattedMessage id="header.menu.base" defaultMessage={defaultZH_EN['header.menu.base']}/>
-//                 </span>
-//               </Menu.Item>
-//               <Menu.Item key="analysis">
-//                 <span>
-//                   <FormattedMessage id="header.menu.analysis" defaultMessage={defaultZH_EN['header.menu.analysis']}/>
-//                 </span>
-//               </Menu.Item>

@@ -10,6 +10,11 @@ class LeftMenu extends Component {
     this.state = {}
   }
 
+  componentWillMount () {
+    console.log(this.props.modle)
+    location.hash = "/" + MenuList[this.props.modle][0].key
+  }
+
   handleClick = (e) => {
     location.hash = "/" + e.key;
   }
@@ -48,8 +53,7 @@ class LeftMenu extends Component {
       <div className="left-menu">
         <Menu
           onClick={this.handleClick}
-          defaultSelectedKeys={['1']}
-          defaultOpenKeys={['sub1']}
+          defaultSelectedKeys={[MenuList[this.props.modle][0].key]}
           mode="inline"
         >
           {this.getMenuList()}
