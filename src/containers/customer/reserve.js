@@ -4,8 +4,10 @@ import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
 import ClubberImport from "./clubberImport"
+import ReserveForm from "./reserveForm"
+import ReserveExport from "./reserveExport"
 const formItemLayout = {
-  labelCol: { span: 4 },
+  labelCol: { span: 6 },
   wrapperCol: { span: 14 },
 };
 const modalItemLayout = {
@@ -14,6 +16,7 @@ const modalItemLayout = {
 }
 const Option = Select.Option;
 const FormItem = Form.Item;
+const { MonthPicker, RangePicker } = DatePicker;
 const InputGroup = Input.Group;
 const options = [{
   value: 'zhejiang',
@@ -27,6 +30,7 @@ const options = [{
     }],
   }],
 }, {
+  
   value: 'jiangsu',
   label: 'Jiangsu',
   children: [{
@@ -48,6 +52,7 @@ class Reserve extends Component {
       detaiVisible: false,
       editVisible: false,
       importVisible: false,
+      exportVisible: false,
       detailData: {},
       editData: {},
       addEditTitle: "",
@@ -56,6 +61,8 @@ class Reserve extends Component {
       mobile: "",
       projectData: [],
       projectValue: "all",
+      reserveVisible: false,
+      operateType: ""
     }
     this.columns = ClubberDetail.getReserveItem(this)
   }
@@ -124,30 +131,36 @@ class Reserve extends Component {
 
   /*表格操作*/
   operateClick (flag, record, index) {
+    console.log(flag)
     if(flag === "detail") {
       this.setState({
         detaiVisible: true,
         detailData: record
       })
     }
-    else if(flag === "edit"){
+    else if(flag === "reserve"){
       this.setState({
-        editVisible: true,
-        editData: record,
-        addEditTitle: record.name + "信息编辑"
+        reserveVisible: true,
       })
     }
-    else if(flag === "delete"){
+    else if (flag === "change") {
+      this.setState({
+        reserveVisible: true
+      })
+    }
+    else if(flag === "cancel"){
       Modal.confirm({
-        title: "确定删除" + record.name + "信息",
+        title: "确定取消xxx的订单",
         content: '',
         onOk() {
-          console.log('OK');
         },
         onCancel() {
         },
       });
     }
+    this.setState({
+      operateType: flag
+    })
   }
 
   handleChange (value) {
@@ -193,6 +206,8 @@ class Reserve extends Component {
       detaiVisible: false,
       editVisible: false,
       importVisible: false,
+      reserveVisible: false,
+      exportVisible: false,
     });
   }
 
@@ -201,6 +216,8 @@ class Reserve extends Component {
       detaiVisible: false,
       editVisible: false,
       importVisible: false,
+      reserveVisible: false,
+      exportVisible: false,
     });
   }
   /*用户信息详情*/
@@ -504,7 +521,9 @@ class Reserve extends Component {
   }
   /*导出*/
   exportClick () {
-
+    this.setState({
+      exportVisible: true
+    })
   }
   /*导入*/
   importClick () {
@@ -604,7 +623,14 @@ class Reserve extends Component {
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="帐号状态：">                  
+                  label="订单日期">                  
+                    <RangePicker />
+                </FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem
+                  {...formItemLayout}
+                  label="预约服务日期">                  
                     <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
                       <Option value="00">全部</Option>
                       <Option value="01">未激活</Option>
@@ -618,7 +644,7 @@ class Reserve extends Component {
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="产品服务：">                  
+                  label="预约服务日期">                  
                     <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
                       <Option value="00">全部</Option>
                       <Option value="01">未激活</Option>
@@ -629,17 +655,13 @@ class Reserve extends Component {
                     </Select>
                 </FormItem>
               </Col>
-              <Col span={8}>
-              </Col>
             </Row>
           </div>
           <div className="group-search-operate">
             <span className="group-search-button">
               <Button type="primary" onClick={this.searchClick.bind(this)}>搜索</Button>
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
-              <Button type="primary" onClick={this.addUserClick.bind(this)}>用户新增</Button>
-              <Button type="primary" onClick={this.importClick.bind(this)}>用户导入</Button>
-              <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
+              <Button type="primary" onClick={this.exportClick.bind(this)}>预约导出</Button>
             </span>
           </div>
           <div className="line-area"></div>
@@ -675,6 +697,24 @@ class Reserve extends Component {
           width={600}
         >
           <ClubberImport />
+        </Modal>
+        <Modal
+          title="用户预约操作"
+          visible={this.state.reserveVisible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          width={800}
+        >
+          <ReserveForm type={this.state.operateType} />
+        </Modal>
+        <Modal
+          title="请勾选导出查询信息项,"
+          visible={this.state.exportVisible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          width={800}
+        > 
+          <ReserveExport dataSource={this.state.data} />
         </Modal>
       </div>
     );

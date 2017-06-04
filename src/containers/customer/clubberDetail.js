@@ -173,15 +173,19 @@ const UserDetail = {
       key: 'mobile',
       dataIndex: "mobile"
     },{
+      title: '网站通知',
+      key: 'mes',
+      dataIndex: "mes"
+    },{
       title: '操作',
       key: 'operate',
       dataIndex: 'operate',
       render: (text, record, index) => {
         return <span className="table-operate">
           <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
-          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>预约</a></span>
-          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>改约</a></span>
-          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>取消</a></span>
+          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index)}><a>预约</a></span>
+          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
+          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "cancel", record, index)}><a>取消</a></span>
         </span>
       },
     }]
@@ -235,6 +239,43 @@ const UserDetail = {
       title: '预约名额',
       dataIndex: 'sexName',
       key: 'sexName',
+    }]
+  },
+  /*预约导出项名称*/
+  getExportItem: (data) => {
+    return [{
+      label: "项目名称",
+      value: ""
+    },{
+      label: "产品服务",
+      value: ""
+    },{
+      label: "患者姓名",
+      value: ""
+    },{
+      label: "性别",
+      value: "sex"
+    },{
+      label: "婚姻",
+      value: "maritalName"
+    },{
+      label: "身份证件类型",
+      value: "certiTypeName"
+    },{
+      label: "身份证件号",
+      value: "certiId"
+    },{
+      label: "关系",
+      value: "relKindName"
+    },{
+      label: "主套餐",
+      value: ""
+    },{
+      label: "服务机构",
+      value: ""
+    },{
+      label: "服务状态",
+      value: ""
     }]
   }
 }

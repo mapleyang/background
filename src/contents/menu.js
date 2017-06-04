@@ -59,11 +59,11 @@ const MenuList = {
   customerService: [{
     key: "clubber",
     icon: "appstore",
-    title: "会员信息"
+    title: "用户信息"
   },{
     key: "clubberlogin",
     icon: "appstore",
-    title: "会员登陆"
+    title: "用户登陆"
   },{
     key: "reserve",
     icon: "appstore",

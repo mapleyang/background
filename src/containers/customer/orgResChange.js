@@ -5,8 +5,8 @@ import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
 import ClubberImport from "./clubberImport"
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 14 },
+  labelCol: { span: 5 },
+  wrapperCol: { span: 15 },
 };
 const modalItemLayout = {
   labelCol: { span: 8 },
@@ -527,7 +527,7 @@ class OrgResChange extends Component {
   }
 
 
-  render() {
+    render() {
     return (
       <div className="right-content">
         <div className="group-user">
@@ -550,7 +550,7 @@ class OrgResChange extends Component {
                 <Col span={8}>
                   <FormItem
                   {...formItemLayout}
-                    label="机构组织：">                  
+                    label="产品服务：">                  
                     <Select defaultValue="lucy" style={{ width: "100%" }} onChange={this.agencyChange.bind(this)}>
                       <Option value="jack">Jack</Option>
                       <Option value="lucy">Lucy</Option>
@@ -563,8 +563,13 @@ class OrgResChange extends Component {
                   <FormItem
                     labelCol = {{ span: 6 }}
                     wrapperCol = {{ span: 14 }}
-                    label="员工/会员号：">
-                    <Input />
+                    label="服务集团">
+                    <Select defaultValue="lucy" style={{ width: "100%" }} onChange={this.agencyChange.bind(this)}>
+                      <Option value="jack">Jack</Option>
+                      <Option value="lucy">Lucy</Option>
+                      <Option value="disabled" disabled>Disabled</Option>
+                      <Option value="Yiminghe">yiminghe</Option>
+                    </Select>
                   </FormItem>
                 </Col>
               </Row>
@@ -573,14 +578,19 @@ class OrgResChange extends Component {
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="登陆账号：">                  
-                    <Input onChange={this.countLoginChange} value={this.state.loginAccount}/>
+                  label="服务机构">                  
+                    <Select defaultValue="lucy" style={{ width: "100%" }} onChange={this.agencyChange.bind(this)}>
+                      <Option value="jack">Jack</Option>
+                      <Option value="lucy">Lucy</Option>
+                      <Option value="disabled" disabled>Disabled</Option>
+                      <Option value="Yiminghe">yiminghe</Option>
+                    </Select>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="手机号：">   
+                  label="省/直辖市">   
                   <Input onChange={this.mobileChange} value={this.state.mobile}/>
                 </FormItem>
               </Col>
@@ -588,7 +598,7 @@ class OrgResChange extends Component {
                 <FormItem
                   labelCol = {{ span: 6 }}
                   wrapperCol = {{ span: 14 }}
-                  label="身份证件号："
+                  label="服务城市"
                   className="item-idCard">   
                   <InputGroup compact>
                     <Select defaultValue="idCard">
@@ -600,45 +610,13 @@ class OrgResChange extends Component {
                 </FormItem>
               </Col>
             </Row>
-            <Row>
-              <Col span={8}>
-                <FormItem
-                  {...formItemLayout}
-                  label="帐号状态：">                  
-                    <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                      <Option value="00">全部</Option>
-                      <Option value="01">未激活</Option>
-                      <Option value="02">激活</Option>
-                      <Option value="03">失效</Option>
-                      <Option value="04">禁用</Option>
-                      <Option value="05">作废</Option>
-                    </Select>
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem
-                  {...formItemLayout}
-                  label="产品服务：">                  
-                    <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                      <Option value="00">全部</Option>
-                      <Option value="01">未激活</Option>
-                      <Option value="02">激活</Option>
-                      <Option value="03">失效</Option>
-                      <Option value="04">禁用</Option>
-                      <Option value="05">作废</Option>
-                    </Select>
-                </FormItem>
-              </Col>
-              <Col span={8}>
-              </Col>
-            </Row>
           </div>
           <div className="group-search-operate">
             <span className="group-search-button">
               <Button type="primary" onClick={this.searchClick.bind(this)}>搜索</Button>
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
-              <Button type="primary" onClick={this.addUserClick.bind(this)}>用户新增</Button>
-              <Button type="primary" onClick={this.importClick.bind(this)}>用户导入</Button>
+              <Button type="primary" onClick={this.addUserClick.bind(this)}>机构新增</Button>
+              <Button type="primary" onClick={this.importClick.bind(this)}>机构导入</Button>
               <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
             </span>
           </div>

@@ -4,9 +4,10 @@ import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
 import ClubberImport from "./clubberImport"
+import Condition from "./condition"
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 14 },
+  labelCol: { span: 5 },
+  wrapperCol: { span: 15 },
 };
 const modalItemLayout = {
   labelCol: { span: 8 },
@@ -56,43 +57,45 @@ class OrgResImport extends Component {
       mobile: "",
       projectData: [],
       projectValue: "all",
+      groups: [],
+      institution: [],
+      region: [],
+      citys: [],
+      groupValue: "all",
+      provinceValue: "all",
+      serviceValue: "all"
     }
     this.columns = ClubberDetail.getOrgImportItem(this)
   }
 
   componentWillMount () {
+    const _this = this;
     //后台用户信息接口
     UserInfo.getUserInfo();
     //会员信息接口
     this.getClubberInfo();
     //项目接口
-    this.getProjectInfo();
-  }
-
-  /*项目信息获取*/
-  getProjectInfo () {
-    const _this = this;
-    window.$.ajax({
-      type: 'GET',
-      url: "/chealth/background/ajaxBusiness/loadCustProjectList",
-      dataType:'json',
-      success:function(res){
-        if(res.success === "true") {
-          _this.setState({
-            projectData: res.data,
-          })
-        }
-        else {
-          // Modal.error({
-          //   title: data.errors[0].errorMessage,
-          //   content: '',
-          // });
-        }
-      },
-      error:function(){
+    let project = new Promise(function(resolve, reject) {
+      Condition.getProjects(_this, resolve, reject)
+    })
+    project.then(function(value) {
+      //产品服务
+      Condition.getServices()
+      //服务集团
+      let data = {
+        "cusId": "1",                
+        "custPscId": "5"
       }
+      Condition.getGroups(data, _this);
+      //省/直辖市
+      Condition.getProvince(data, _this)
+    }, function(value) {
+      // failure
+
     });
   }
+
+
 
   getClubberInfo (body) {
     const _this = this;
@@ -240,240 +243,6 @@ class OrgResImport extends Component {
     return item;
   }
 
-  /*用户新增与编辑*/
-  getUserAddEdit () {
-    let item = "";
-    const { getFieldDecorator } = this.props.form;
-    item = <Form>
-      <div className="table-dialog-area">
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="项目名称">                  
-                  <Select defaultValue="all" value={this.state.projectValue} style={{ width: "100%" }} onChange={this.projectChange.bind(this)}>
-                    <Option value="all">全部</Option>
-                    {this.state.projectData.length === 0 ? [] : this.state.projectData.map(el => {
-                      return <Option value={el.cusId}>{el.projectName}</Option>
-                    })}
-                  </Select>
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="团体名称">                  
-                  <span>{this.state.detailData.birth}</span>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="产品服务">                  
-                  <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                    <Option value="00">全部</Option>
-                    <Option value="01">未激活</Option>
-                    <Option value="02">激活</Option>
-                    <Option value="03">失效</Option>
-                    <Option value="04">禁用</Option>
-                    <Option value="05">作废</Option>
-                  </Select>
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="账号状态">                  
-                  <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                    <Option value="00">全部</Option>
-                    <Option value="01">未激活</Option>
-                    <Option value="02">激活</Option>
-                    <Option value="03">失效</Option>
-                    <Option value="04">禁用</Option>
-                    <Option value="05">作废</Option>
-                  </Select>
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="用户姓名"
-                hasFeedback>                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="性别"
-                hasFeedback>    
-                <Select defaultValue="0">
-                  <Option value="0">男</Option>
-                  <Option value="1">女</Option>
-                </Select>          
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="出生年月"
-                hasFeedback>                  
-                  <DatePicker />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="婚姻状况"
-                hasFeedback>    
-                  <Select defaultValue="0">
-                    <Option value="0">已婚</Option>
-                    <Option value="1">未婚</Option>
-                  </Select>          
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="用户手机"
-                hasFeedback>                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="用户邮箱"
-                hasFeedback>    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="身份证件号"
-                hasFeedback>                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="员工/会员号">    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="工作城市">                  
-                  <Select defaultValue="0">
-                    <Option value="0">北京</Option>
-                    <Option value="1">上海</Option>
-                  </Select> 
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="角色/职位">    
-                <Select defaultValue="0">
-                    <Option value="0">经理</Option>
-                    <Option value="1">员工</Option>
-                  </Select>             
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="机构组织">                  
-                  <Select defaultValue="0">
-                    <Option value="0">机构1</Option>
-                    <Option value="1">机构2</Option>
-                  </Select> 
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="部门组织">    
-                <Select defaultValue="0">
-                    <Option value="0">部门1</Option>
-                    <Option value="1">部门2</Option>
-                  </Select>               
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="联系手机">                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="联系邮箱">    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="所在地区">                  
-                  <Cascader options={options} placeholder="Please select" />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="详细地址">    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div style={{marginTop: "10px"}}>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="备注">                  
-                  <Input />
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-      </div>
-    </Form>
-    return item;
-  }
-
   /*查询*/
   searchClick () {
     let data = {}
@@ -488,12 +257,12 @@ class OrgResImport extends Component {
   /*清空*/
   clearClick () {
     this.setState({
-      accountStatus: "00",
-      loginAccount: "",
-      mobile: "",
-      projectValue: "all"
+      projectValue: "all",
+      serviceValue: "all",
+      provinceValue: "all",
+      groupValue: "all",
     })
-    this.getClubberInfo()
+    // this.getClubberInfo()
   }
   /*新增*/
   addUserClick () {
@@ -526,6 +295,52 @@ class OrgResImport extends Component {
     })
   }
 
+  /*获取select options*/
+  getOptions (value) {
+    let item = <Option value="all">全部</Option>
+    if(value.length !== 0) {
+      item = value.map(el => {
+        if(el.value === "") {
+          return <Option value="all">全部</Option>
+        }
+        return <Option value={el.value}>{el.label}</Option>
+      })
+    }
+    return item;
+  }
+
+  /*服务产品选择事件*/
+  serviceChange (value) {
+    this.setState({
+      serviceValue: value
+    })
+  }
+
+  /*服务集团选择事件*/
+  groupsSelect (value) {
+    let data = {
+      "cusId": "1",                 
+      "custPscId": "5",              
+      "hcuGroupId": value
+    }
+    Condition.getInstitution(data, this)
+    this.setState({
+      groupValue: value
+    })
+  }
+
+  /*省/直辖市选择事件*/
+  provinceSelect (value) {
+    let data = {
+      "cusId": "1",                 //客户Id
+      "custPscId": "1",               //客户所购服务周期ID
+      "parplmId": value               //省(直辖市)ID
+    }
+    Condition.getCitys(data, this)
+    this.setState({
+      provinceValue: value
+    })
+  }
 
   render() {
     return (
@@ -549,87 +364,75 @@ class OrgResImport extends Component {
                 </Col>
                 <Col span={8}>
                   <FormItem
-                  {...formItemLayout}
-                    label="机构组织：">                  
-                    <Select defaultValue="lucy" style={{ width: "100%" }} onChange={this.agencyChange.bind(this)}>
-                      <Option value="jack">Jack</Option>
-                      <Option value="lucy">Lucy</Option>
-                      <Option value="disabled" disabled>Disabled</Option>
-                      <Option value="Yiminghe">yiminghe</Option>
+                    {...formItemLayout}
+                    label="服务集团">
+                    <Select 
+                      placeholder={this.state.serviceValue === "all" ? "请先选择产品服务" : "请选择服务集团"} 
+                      disabled={this.state.serviceValue === "all" ? true : false}
+                      style={{ width: "100%" }} 
+                      onChange={this.groupsSelect.bind(this)}>
+                      {this.getOptions(this.state.groups)}
                     </Select>
                   </FormItem>
                 </Col>
                 <Col span={8}>
                   <FormItem
-                    labelCol = {{ span: 6 }}
-                    wrapperCol = {{ span: 14 }}
-                    label="员工/会员号：">
-                    <Input />
+                    {...formItemLayout}
+                    label="省/直辖市">   
+                    <Select 
+                      placeholder={this.state.serviceValue === "all" ? "请先选择产品服务" : "请选择省/直辖市"} 
+                      disabled={this.state.serviceValue === "all" ? true : false}
+                      style={{ width: "100%" }} 
+                      onChange={this.provinceSelect.bind(this)}>
+                      {this.getOptions(this.state.region)}
+                    </Select>
                   </FormItem>
                 </Col>
               </Row>
             </div>
             <Row>
               <Col span={8}>
+                  <FormItem
+                  {...formItemLayout}
+                    label="产品服务">                  
+                    <Select 
+                      placeholder={this.state.projectValue === "all" ? "请先选择项目" : "请选择服务产品"} 
+                      disabled={this.state.projectValue === "all" ? true : false} 
+                      style={{ width: "100%" }} 
+                      onChange={this.serviceChange.bind(this)}>
+                      <Option value="jack">Jack</Option>
+                      <Option value="lucy">Lucy</Option>
+                      <Option value="disabled" disabled>Disabled</Option>
+                      <Option value="Yiminghe">yiminghe</Option>
+                    </Select>
+                  </FormItem>
+                </Col>  
+              <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="登陆账号：">                  
-                    <Input onChange={this.countLoginChange} value={this.state.loginAccount}/>
+                  label="服务机构">                  
+                    <Select 
+                      placeholder={this.state.groupValue === "all" ? "请先选择服务集团" : "请选择服务机构"} 
+                      disabled={this.state.groupValue === "all" ? true : false} 
+                      style={{ width: "100%" }} 
+                      onChange={this.agencyChange.bind(this)}>
+                      {this.getOptions(this.state.institution)}
+                    </Select>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="手机号：">   
-                  <Input onChange={this.mobileChange} value={this.state.mobile}/>
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem
-                  labelCol = {{ span: 6 }}
-                  wrapperCol = {{ span: 14 }}
-                  label="身份证件号："
+                  label="服务城市"
                   className="item-idCard">   
-                  <InputGroup compact>
-                    <Select defaultValue="idCard">
-                      <Option value="idCard">身份证</Option>
-                      <Option value="passport">护照</Option>
-                    </Select>
-                    <Input style={{ width: '68%' }} />
-                  </InputGroup> 
+                  <Select 
+                    placeholder={this.state.provinceValue === "all" ? "请先选择省/直辖市" : "请选择服务城市"} 
+                    disabled={this.state.provinceValue === "all" ? true : false} 
+                    style={{ width: "100%" }} 
+                    onChange={this.agencyChange.bind(this)}>
+                    {this.getOptions(this.state.citys)}
+                  </Select>
                 </FormItem>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={8}>
-                <FormItem
-                  {...formItemLayout}
-                  label="帐号状态：">                  
-                    <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                      <Option value="00">全部</Option>
-                      <Option value="01">未激活</Option>
-                      <Option value="02">激活</Option>
-                      <Option value="03">失效</Option>
-                      <Option value="04">禁用</Option>
-                      <Option value="05">作废</Option>
-                    </Select>
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem
-                  {...formItemLayout}
-                  label="产品服务：">                  
-                    <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                      <Option value="00">全部</Option>
-                      <Option value="01">未激活</Option>
-                      <Option value="02">激活</Option>
-                      <Option value="03">失效</Option>
-                      <Option value="04">禁用</Option>
-                      <Option value="05">作废</Option>
-                    </Select>
-                </FormItem>
-              </Col>
-              <Col span={8}>
               </Col>
             </Row>
           </div>
@@ -637,8 +440,7 @@ class OrgResImport extends Component {
             <span className="group-search-button">
               <Button type="primary" onClick={this.searchClick.bind(this)}>搜索</Button>
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
-              <Button type="primary" onClick={this.addUserClick.bind(this)}>用户新增</Button>
-              <Button type="primary" onClick={this.importClick.bind(this)}>用户导入</Button>
+              <Button type="primary" onClick={this.importClick.bind(this)}>排期名额导入</Button>
               <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
             </span>
           </div>
@@ -654,18 +456,9 @@ class OrgResImport extends Component {
           visible={this.state.detaiVisible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
-          width={600}
+          width={1000}
         >
           {this.getUserDetail()}
-        </Modal>
-        <Modal
-          title={this.state.addEditTitle}
-          visible={this.state.editVisible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={600}
-        >
-          {this.getUserAddEdit()}
         </Modal>
         <Modal
           title="用户信息导入"

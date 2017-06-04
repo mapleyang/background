@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker  } from 'antd'
+import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, Checkbox } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
@@ -12,6 +12,7 @@ const modalItemLayout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 10 },
 }
+const { MonthPicker, RangePicker } = DatePicker;
 const Option = Select.Option;
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -203,42 +204,6 @@ class ClubberLogin extends Component {
       importVisible: false,
     });
   }
-  /*用户信息详情*/
-  getUserDetail () {
-    let item = "";
-    let list = [];
-    let colList = [];
-    ClubberDetail.getUserItemDetail(this.state.detailData).forEach((el, index) => {
-      let ColEl = <Col span={12}>
-        <FormItem
-          {...modalItemLayout}
-          label={el.label}>                  
-            <span>{el.value}</span>
-        </FormItem>
-      </Col>
-      colList.push(ColEl)
-      if(index % 2) {
-        let RowEl = <Row>
-          {colList}
-        </Row>
-        list.push(RowEl);
-        colList = [];
-      }
-      if((ClubberDetail.getUserItemDetail(this.state.detailData).length % 2) && (ClubberDetail.getUserItemDetail(this.state.detailData).length - 1 === index)) {
-        let RowEl = <Row>
-          {colList}
-        </Row>
-        list.push(RowEl);
-        colList = [];
-      }
-    });
-
-    item = <div className="table-dialog-area">
-
-      {list}
-    </div>
-    return item;
-  }
 
   /*用户新增与编辑*/
   getUserAddEdit () {
@@ -246,229 +211,112 @@ class ClubberLogin extends Component {
     const { getFieldDecorator } = this.props.form;
     item = <Form>
       <div className="table-dialog-area">
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="项目名称">                  
-                  <Select defaultValue="all" value={this.state.projectValue} style={{ width: "100%" }} onChange={this.projectChange.bind(this)}>
-                    <Option value="all">全部</Option>
-                    {this.state.projectData.length === 0 ? [] : this.state.projectData.map(el => {
-                      return <Option value={el.cusId}>{el.projectName}</Option>
-                    })}
-                  </Select>
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="团体名称">                  
-                  <span>{this.state.detailData.birth}</span>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="产品服务">                  
-                  <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                    <Option value="00">全部</Option>
-                    <Option value="01">未激活</Option>
-                    <Option value="02">激活</Option>
-                    <Option value="03">失效</Option>
-                    <Option value="04">禁用</Option>
-                    <Option value="05">作废</Option>
-                  </Select>
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="账号状态">                  
-                  <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                    <Option value="00">全部</Option>
-                    <Option value="01">未激活</Option>
-                    <Option value="02">激活</Option>
-                    <Option value="03">失效</Option>
-                    <Option value="04">禁用</Option>
-                    <Option value="05">作废</Option>
-                  </Select>
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="用户姓名"
-                hasFeedback>                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="性别"
-                hasFeedback>    
-                <Select defaultValue="0">
-                  <Option value="0">男</Option>
-                  <Option value="1">女</Option>
-                </Select>          
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="出生年月"
-                hasFeedback>                  
-                  <DatePicker />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="婚姻状况"
-                hasFeedback>    
-                  <Select defaultValue="0">
-                    <Option value="0">已婚</Option>
-                    <Option value="1">未婚</Option>
-                  </Select>          
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="用户手机"
-                hasFeedback>                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="用户邮箱"
-                hasFeedback>    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="身份证件号"
-                hasFeedback>                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="员工/会员号">    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="工作城市">                  
-                  <Select defaultValue="0">
-                    <Option value="0">北京</Option>
-                    <Option value="1">上海</Option>
-                  </Select> 
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="角色/职位">    
-                <Select defaultValue="0">
-                    <Option value="0">经理</Option>
-                    <Option value="1">员工</Option>
-                  </Select>             
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="机构组织">                  
-                  <Select defaultValue="0">
-                    <Option value="0">机构1</Option>
-                    <Option value="1">机构2</Option>
-                  </Select> 
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="部门组织">    
-                <Select defaultValue="0">
-                    <Option value="0">部门1</Option>
-                    <Option value="1">部门2</Option>
-                  </Select>               
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="联系手机">                  
-                  <Input />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="联系邮箱">    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="所在地区">                  
-                  <Cascader options={options} placeholder="Please select" />
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="详细地址">    
-                <Input />              
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div style={{marginTop: "10px"}}>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="备注">                  
-                  <Input />
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="登陆时间重置"
+              hasFeedback>                  
+                <RangePicker />
+            </FormItem>
+          </Col>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="登陆权限禁用">    
+              {getFieldDecorator('loginSetting')(
+                <Checkbox></Checkbox>
+              )}      
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              className="form-item-title"
+              label="密码重置">                  
+            </FormItem>
+          </Col>
+          <Col span={12}>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="输入新密码"
+              hasFeedback>                  
+                <Input />
+            </FormItem>
+          </Col>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="重复新密码"
+              hasFeedback>    
+              <Input />              
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="产品服务有效期设置">                  
+            </FormItem>
+          </Col>
+          <Col span={12}>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="会员体检">                  
+                <RangePicker />
+            </FormItem>
+          </Col>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="家属体检">    
+              <RangePicker />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="会员体检">                  
+               <RangePicker />
+            </FormItem>
+          </Col>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="家属体检">    
+              <RangePicker />            
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="自费齿科">                  
+                <RangePicker />
+            </FormItem>
+          </Col>
+          <Col span={12}>
+            <FormItem
+              {...modalItemLayout}
+              label="体检解答">    
+              <RangePicker />            
+            </FormItem>
+          </Col>
+        </Row>
       </div>
     </Form>
     return item;
@@ -494,23 +342,6 @@ class ClubberLogin extends Component {
       projectValue: "all"
     })
     this.getClubberInfo()
-  }
-  /*新增*/
-  addUserClick () {
-    this.setState({
-      editVisible: true,
-      addEditTitle: "新增用户信息"
-    })
-  }
-  /*导出*/
-  exportClick () {
-
-  }
-  /*导入*/
-  importClick () {
-    this.setState({
-      importVisible: true
-    })
   }
   /*登陆账号更改*/
   countLoginChange = (e) => {
@@ -637,9 +468,6 @@ class ClubberLogin extends Component {
             <span className="group-search-button">
               <Button type="primary" onClick={this.searchClick.bind(this)}>搜索</Button>
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
-              <Button type="primary" onClick={this.addUserClick.bind(this)}>用户新增</Button>
-              <Button type="primary" onClick={this.importClick.bind(this)}>用户导入</Button>
-              <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
             </span>
           </div>
           <div className="line-area"></div>
@@ -650,31 +478,12 @@ class ClubberLogin extends Component {
           </div>
         </div>
         <Modal
-          title={this.state.detailData.name + "信息详情"}
+          title={this.state.detailData.name + "登陆信息重置"}
           visible={this.state.detaiVisible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
-          width={600}
-        >
-          {this.getUserDetail()}
-        </Modal>
-        <Modal
-          title={this.state.addEditTitle}
-          visible={this.state.editVisible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={600}
-        >
+          width={1000}>
           {this.getUserAddEdit()}
-        </Modal>
-        <Modal
-          title="用户信息导入"
-          visible={this.state.importVisible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={600}
-        >
-          <ClubberImport />
         </Modal>
       </div>
     );

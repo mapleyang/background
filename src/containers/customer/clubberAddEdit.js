@@ -49,6 +49,8 @@ class ClubberAddEdit extends Component {
     }
     return (
       <div className="clubber-import">
+        <Form>
+    </Form>
       </div>
     );
   }

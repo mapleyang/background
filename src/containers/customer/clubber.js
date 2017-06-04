@@ -4,6 +4,9 @@ import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
 import ClubberImport from "./clubberImport"
+import Condition from "./condition"
+import Operate from "./operate"
+import ClubberDelete from "./clubberDelete"
 const formItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 14 },
@@ -15,30 +18,6 @@ const modalItemLayout = {
 const Option = Select.Option;
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
-const options = [{
-  value: 'zhejiang',
-  label: 'Zhejiang',
-  children: [{
-    value: 'hangzhou',
-    label: 'Hangzhou',
-    children: [{
-      value: 'xihu',
-      label: 'West Lake',
-    }],
-  }],
-}, {
-  value: 'jiangsu',
-  label: 'Jiangsu',
-  children: [{
-    value: 'nanjing',
-    label: 'Nanjing',
-    children: [{
-      value: 'zhonghuamen',
-      label: 'Zhong Hua Men',
-    }],
-  }],
-}];
-
 
 class Clubber extends Component {
   constructor(props, context) {
@@ -46,52 +25,47 @@ class Clubber extends Component {
     this.state = {
       data: [],
       detaiVisible: false,
-      editVisible: false,
+      addEditVisible: false,
       importVisible: false,
+      clubberDeleteVisible: false,
       detailData: {},
       editData: {},
       addEditTitle: "",
       loginAccount: "",
       accountStatus: "00",
-      mobile: "",
       projectData: [],
       projectValue: "all",
+      idCardType: [],
+      idCardTypeValue: "all",
+      region: [],
+      workCitys: [],
+      institutions: [],
+      departments: [],
+      workPosition: [],
     }
     this.columns = ClubberDetail.getUserColumns(this)
   }
 
   componentWillMount () {
+    const _this = this;
     //后台用户信息接口
     UserInfo.getUserInfo();
     //会员信息接口
     this.getClubberInfo();
     //项目接口
-    this.getProjectInfo();
-  }
+    let project = new Promise(function(resolve, reject) {
+      Condition.getProjects(_this, resolve, reject)
+    })
+    project.then(function(value) {
+      //产品服务
+      Condition.getServices()
+      //组织机构
+    }, function(value) {
+      // failure
 
-  /*项目信息获取*/
-  getProjectInfo () {
-    const _this = this;
-    window.$.ajax({
-      type: 'GET',
-      url: "/chealth/background/ajaxBusiness/loadCustProjectList",
-      dataType:'json',
-      success:function(res){
-        if(res.success === "true") {
-          _this.setState({
-            projectData: res.data,
-          })
-        }
-        else {
-          // Modal.error({
-          //   title: data.errors[0].errorMessage,
-          //   content: '',
-          // });
-        }
-      },
-      error:function(){
-      }
     });
+    /*获取身份证号*/
+    Condition.getIdCardType(_this)
   }
 
   getClubberInfo (body) {
@@ -132,21 +106,30 @@ class Clubber extends Component {
     }
     else if(flag === "edit"){
       this.setState({
-        editVisible: true,
+        addEditVisible: true,
         editData: record,
         addEditTitle: record.name + "信息编辑"
       })
+      let data = {
+        memberName: record.name,
+        sex: record.sex,
+        marital: record.marital,
+        mobile: record.mobile,
+        email: record.email,
+        cardType: record.certiType,
+        certiId: record.certiId,
+        workCity: record.workCity,
+        workPosition: record.workPosition,
+        cusDepartmentId: record.department,
+      }
+      this.props.form.setFieldsValue(data)
     }
     else if(flag === "delete"){
-      Modal.confirm({
-        title: "确定删除" + record.name + "信息",
-        content: '',
-        onOk() {
-          console.log('OK');
-        },
-        onCancel() {
-        },
-      });
+      this.setState({
+        clubberDeleteVisible: true,
+        detailData: record
+      })
+      Operate.getClubberReserveInfo(this, record);
     }
   }
 
@@ -156,7 +139,6 @@ class Clubber extends Component {
 
   /*账号状态修改*/
   countStatusChange (value) {
-    console.log(value)
     let data = {
       accountStatus: value
     }
@@ -186,21 +168,44 @@ class Clubber extends Component {
 
   }
 
+  /*新增编辑确认*/
+  addEdithandleOk () {
+    const _this = this;
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        let data = {};
+        for(let key in values) {
+          if(key === "birth") {
+            let date = new Date(values[key]._d)
+            data.birthYear = date.getFullYear();
+            data.birthMonth = date.getMonth() + 1;
+            data.birthDay = date.getDate();
+          }
+          else {
+            data[key] = values[key];
+          }
+        }
+        Operate.clubberInfoAdd(_this, data)
+      }
+    });
+  }
+
   /*模态框*/
   handleOk = (e) => {
-    console.log(e);
     this.setState({
       detaiVisible: false,
-      editVisible: false,
+      addEditVisible: false,
       importVisible: false,
+      clubberDeleteVisible: false,
     });
   }
 
   handleCancel = (e) => {
     this.setState({
       detaiVisible: false,
-      editVisible: false,
+      addEditVisible: false,
       importVisible: false,
+      clubberDeleteVisible: false
     });
   }
   /*用户信息详情*/
@@ -240,6 +245,70 @@ class Clubber extends Component {
     return item;
   }
 
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log(values)
+      }
+    });
+  }
+
+        // <div className="table-area-line">
+        //   <Row>
+        //     <Col span={12}>
+        //       <FormItem
+        //         {...modalItemLayout}
+        //         label="项目名称">     
+        //           {getFieldDecorator('userName')(
+        //             <Select defaultValue="all" style={{ width: "100%" }} onChange={this.projectChange.bind(this)}>
+        //               <Option value="all">全部</Option>
+        //               {this.state.projectData.length === 0 ? [] : this.state.projectData.map(el => {
+        //                 return <Option value={el.cusId}>{el.projectName}</Option>
+        //               })}
+        //             </Select>
+        //           )}             
+        //       </FormItem>
+        //     </Col>
+        //     <Col span={12}>
+        //       <FormItem
+        //         {...modalItemLayout}
+        //         label="团体名称">                  
+        //           <span>{this.state.detailData.birth}</span>
+        //       </FormItem>
+        //     </Col>
+        //   </Row>
+        //   <Row>
+        //     <Col span={12}>
+        //       <FormItem
+        //         {...modalItemLayout}
+        //         label="产品服务">                  
+        //           <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
+        //             <Option value="00">全部</Option>
+        //             <Option value="01">未激活</Option>
+        //             <Option value="02">激活</Option>
+        //             <Option value="03">失效</Option>
+        //             <Option value="04">禁用</Option>
+        //             <Option value="05">作废</Option>
+        //           </Select>
+        //       </FormItem>
+        //     </Col>
+        //     <Col span={12}>
+        //       <FormItem
+        //         {...modalItemLayout}
+        //         label="账号状态">                  
+        //           <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
+        //             <Option value="00">全部</Option>
+        //             <Option value="01">未激活</Option>
+        //             <Option value="02">激活</Option>
+        //             <Option value="03">失效</Option>
+        //             <Option value="04">禁用</Option>
+        //             <Option value="05">作废</Option>
+        //           </Select>
+        //       </FormItem>
+        //     </Col>
+        //   </Row>
+        // </div>
   /*用户新增与编辑*/
   getUserAddEdit () {
     let item = "";
@@ -251,62 +320,13 @@ class Clubber extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="项目名称">                  
-                  <Select defaultValue="all" value={this.state.projectValue} style={{ width: "100%" }} onChange={this.projectChange.bind(this)}>
-                    <Option value="all">全部</Option>
-                    {this.state.projectData.length === 0 ? [] : this.state.projectData.map(el => {
-                      return <Option value={el.cusId}>{el.projectName}</Option>
-                    })}
-                  </Select>
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="团体名称">                  
-                  <span>{this.state.detailData.birth}</span>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="产品服务">                  
-                  <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                    <Option value="00">全部</Option>
-                    <Option value="01">未激活</Option>
-                    <Option value="02">激活</Option>
-                    <Option value="03">失效</Option>
-                    <Option value="04">禁用</Option>
-                    <Option value="05">作废</Option>
-                  </Select>
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
-                label="账号状态">                  
-                  <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                    <Option value="00">全部</Option>
-                    <Option value="01">未激活</Option>
-                    <Option value="02">激活</Option>
-                    <Option value="03">失效</Option>
-                    <Option value="04">禁用</Option>
-                    <Option value="05">作废</Option>
-                  </Select>
-              </FormItem>
-            </Col>
-          </Row>
-        </div>
-        <div className="table-area-line">
-          <Row>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
                 label="用户姓名"
                 hasFeedback>                  
-                  <Input />
+                  {getFieldDecorator('memberName', {
+                    rules: [{ required: true, message: '请输入姓名' }],
+                  })(
+                    <Input placeholder="用户姓名" />
+                  )}
               </FormItem>
             </Col>
             <Col span={12}>
@@ -314,10 +334,14 @@ class Clubber extends Component {
                 {...modalItemLayout}
                 label="性别"
                 hasFeedback>    
-                <Select defaultValue="0">
-                  <Option value="0">男</Option>
-                  <Option value="1">女</Option>
-                </Select>          
+                {getFieldDecorator('sex', {
+                    rules: [{ required: true}],
+                  })(
+                  <Select>
+                    <Option value="1">男</Option>
+                    <Option value="2">女</Option>
+                  </Select>          
+                )}
               </FormItem>
             </Col>
           </Row>
@@ -326,8 +350,12 @@ class Clubber extends Component {
               <FormItem
                 {...modalItemLayout}
                 label="出生年月"
-                hasFeedback>                  
-                  <DatePicker />
+                hasFeedback> 
+                  {getFieldDecorator('birth', {
+                    rules: [{ required: true }],
+                  })(
+                    <DatePicker />
+                  )}                  
               </FormItem>
             </Col>
             <Col span={12}>
@@ -335,10 +363,14 @@ class Clubber extends Component {
                 {...modalItemLayout}
                 label="婚姻状况"
                 hasFeedback>    
-                  <Select defaultValue="0">
-                    <Option value="0">已婚</Option>
-                    <Option value="1">未婚</Option>
-                  </Select>          
+                  {getFieldDecorator('marital', {
+                    rules: [{ required: true }],
+                  })(
+                    <Select>
+                      <Option value="0">已婚</Option>
+                      <Option value="1">未婚</Option>
+                    </Select>          
+                  )} 
               </FormItem>
             </Col>
           </Row>
@@ -347,8 +379,12 @@ class Clubber extends Component {
               <FormItem
                 {...modalItemLayout}
                 label="用户手机"
-                hasFeedback>                  
-                  <Input />
+                hasFeedback>  
+                  {getFieldDecorator('mobile', {
+                    rules: [{ required: true, message: '请输入手机号' }],
+                  })(
+                    <Input placeholder="用户手机" />
+                  )}                
               </FormItem>
             </Col>
             <Col span={12}>
@@ -356,7 +392,11 @@ class Clubber extends Component {
                 {...modalItemLayout}
                 label="用户邮箱"
                 hasFeedback>    
-                <Input />              
+                {getFieldDecorator('email', {
+                    rules: [{ required: true, message: '请输入手机号' }],
+                  })(
+                  <Input placeholder="用户手机" />
+                )}                 
               </FormItem>
             </Col>
           </Row>
@@ -364,16 +404,58 @@ class Clubber extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="身份证件号"
+                label="身份证件类型"
                 hasFeedback>                  
-                  <Input />
+                {getFieldDecorator('cardType', {
+                    rules: [{ required: true, message: '请输入对应的身份证件号' }],
+                  })(
+                 <Select className="icp-selector" notFoundContent="not found">
+                  {this.getIdCardTypeOption("form")}
+                </Select>
+                )}
               </FormItem>
             </Col>
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="员工/会员号">    
-                <Input />              
+                label="身份证件号"
+                hasFeedback>                  
+                {getFieldDecorator('certiId', {
+                    rules: [{ required: true, message: '请输入对应的身份证件号' }],
+                  })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <FormItem
+                {...modalItemLayout}
+                label="员工/会员号"
+                hasFeedback>    
+                {getFieldDecorator('belongMemberId', {
+                    rules: [{ required: true, message: '请输入员工号或会员号' }],
+                  })(
+                  <Input placeholder="员工号或会员号" />
+                )}             
+              </FormItem>
+            </Col>
+            <Col span={12}>
+              <FormItem
+                {...modalItemLayout}
+                label="账号状态">    
+                  {getFieldDecorator('accountStatus', {
+                    rules: [{ required: true, message: '请输入员工号或会员号' }],
+                    })(
+                    <Select>
+                      <Option value="01">未激活</Option> 
+                      <Option value="02">激活</Option>
+                      <Option value="03">失效</Option>
+                      <Option value="04">禁用</Option>
+                      <Option value="05">作废</Option>
+                    </Select>
+                  )}                      
               </FormItem>
             </Col>
           </Row>
@@ -383,21 +465,27 @@ class Clubber extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="工作城市">                  
-                  <Select defaultValue="0">
-                    <Option value="0">北京</Option>
-                    <Option value="1">上海</Option>
-                  </Select> 
+                label="工作城市">      
+                  {getFieldDecorator('workCity')(
+                    <Select>
+                      {this.state.workCitys.map(el => {
+                        return <Option value={el.value}>{el.label}</Option>
+                      })}
+                    </Select>
+                  )}                 
               </FormItem>
             </Col>
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="角色/职位">    
-                <Select defaultValue="0">
-                    <Option value="0">经理</Option>
-                    <Option value="1">员工</Option>
-                  </Select>             
+                label="角色/职位">  
+                {getFieldDecorator('workPosition')(
+                    <Select>
+                      {this.state.workPosition.map(el => {
+                        return <Option value={el.value}>{el.label}</Option>
+                      })}
+                    </Select>
+                  )}     
               </FormItem>
             </Col>
           </Row>
@@ -406,20 +494,26 @@ class Clubber extends Component {
               <FormItem
                 {...modalItemLayout}
                 label="机构组织">                  
-                  <Select defaultValue="0">
-                    <Option value="0">机构1</Option>
-                    <Option value="1">机构2</Option>
-                  </Select> 
+                  {getFieldDecorator('cusInstitutionId')(
+                    <Select>
+                      {this.state.institutions.map(el => {
+                        return <Option value={el.value}>{el.label}</Option>
+                      })}
+                    </Select>
+                  )}     
               </FormItem>
             </Col>
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
                 label="部门组织">    
-                <Select defaultValue="0">
-                    <Option value="0">部门1</Option>
-                    <Option value="1">部门2</Option>
-                  </Select>               
+                {getFieldDecorator('cusDepartmentId')(
+                    <Select>
+                      {this.state.departments.map(el => {
+                        return <Option value={el.value}>{el.label}</Option>
+                      })}
+                    </Select>
+                  )}                  
               </FormItem>
             </Col>
           </Row>
@@ -446,7 +540,12 @@ class Clubber extends Component {
               <FormItem
                 {...modalItemLayout}
                 label="所在地区">                  
-                  <Cascader options={options} placeholder="Please select" />
+                  <Cascader
+                    options={this.state.region}
+                    loadData={this.loadData}
+                    onChange={this.onAreaChange}
+                    changeOnSelect
+                  />
               </FormItem>
             </Col>
             <Col span={12}>
@@ -474,6 +573,36 @@ class Clubber extends Component {
     return item;
   }
 
+  onAreaChange = (value, selectedOptions) => {
+    console.log(selectedOptions);
+    console.log(value);
+    this.setState({
+      inputValue: selectedOptions.map(o => o.label).join(', '),
+    });
+  }
+
+  /*异步加载*/
+  loadData = (selectedOptions) => {
+    const targetOption = selectedOptions[selectedOptions.length - 1];
+    targetOption.loading = true;
+    if(selectedOptions.length === 1) {   //获取市数据
+      let data = {
+        cusId: "1",                 //客户Id
+        custPscId: "1",               //客户所购服务周期ID
+        parplmId: selectedOptions[0].value  
+      }
+      Condition.getCitys(data, targetOption, this)
+    }
+    else {
+      let data = {
+        cusId: "1",                 //客户Id
+        custPscId: "1",               //客户所购服务周期ID
+        parplmId: selectedOptions[selectedOptions.length - 1].value  
+      }
+      Condition.getCountys(data, targetOption, this)
+    }
+  }
+
   /*查询*/
   searchClick () {
     let data = {}
@@ -498,9 +627,30 @@ class Clubber extends Component {
   /*新增*/
   addUserClick () {
     this.setState({
-      editVisible: true,
+      addEditVisible: true,
       addEditTitle: "新增用户信息"
     })
+    /*获取省（直辖市数据）*/
+    let data = {
+      "cusId": "1",                  
+      "custPscId": "0"                
+    }
+    Condition.getProvince(data, this);
+    /*获取工作职位*/
+    Operate.getWorkPosition(this, data);
+    /*获取工作城市*/
+    Operate.getWorkCitys(this, data);
+    /*获取团体机构*/
+    Operate.getInstitutions(this, data);
+    /*获取团体组织*/
+    Operate.getDepartments(this, data);
+    let initData = {
+      sex: "1",
+      marital: "0",
+      cardType: "1",
+      accountStatus: "01"
+    }
+    this.props.form.setFieldsValue(initData);
   }
   /*导出*/
   exportClick () {
@@ -526,6 +676,44 @@ class Clubber extends Component {
     })
   }
 
+  /*获取身份证类型*/
+
+  getIdCardTypeOption (flag) {
+    let item = [];
+    if(flag === "form") {
+      if(this.state.idCardType.length !== 0) {
+        this.state.idCardType.forEach(el => {
+          if(el.value !== "") {
+            item.push(<Option value={el.value}>{el.label}</Option>)
+          }
+        })
+      }
+    }
+    else {
+      if(this.state.idCardType.length !== 0) {
+        item = this.state.idCardType.map(el => {
+          if(el.value === "") {
+            return <Option value="all">全部</Option>
+          }
+          return <Option value={el.value}>{el.label}</Option>
+        })
+      }
+      else {
+        item = <Option value="all">全部</Option>
+      }
+    }
+    return item;
+  }
+  /*身份证类型*/
+  idCardTypeChange (value) {
+    this.setState({
+      idCardTypeValue: value
+    })
+    let data = {
+      cardType: value === "all" ? "" : value
+    }
+    this.getClubberInfo(data)
+  }
 
   render() {
     return (
@@ -591,9 +779,8 @@ class Clubber extends Component {
                   label="身份证件号："
                   className="item-idCard">   
                   <InputGroup compact>
-                    <Select defaultValue="idCard">
-                      <Option value="idCard">身份证</Option>
-                      <Option value="passport">护照</Option>
+                    <Select defaultValue="all" value={this.state.idCardTypeValue} onChange={this.idCardTypeChange.bind(this)}>
+                      {this.getIdCardTypeOption("condition")}
                     </Select>
                     <Input style={{ width: '68%' }} />
                   </InputGroup> 
@@ -619,8 +806,8 @@ class Clubber extends Component {
                 <FormItem
                   {...formItemLayout}
                   label="产品服务：">                  
-                    <Select defaultValue="00" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
-                      <Option value="00">全部</Option>
+                    <Select defaultValue="all" value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
+                      <Option value="all">全部</Option>
                       <Option value="01">未激活</Option>
                       <Option value="02">激活</Option>
                       <Option value="03">失效</Option>
@@ -656,14 +843,13 @@ class Clubber extends Component {
           onCancel={this.handleCancel}
           width={600}
         >
-          {this.getUserDetail()}
         </Modal>
         <Modal
           title={this.state.addEditTitle}
-          visible={this.state.editVisible}
-          onOk={this.handleOk}
+          visible={this.state.addEditVisible}
+          onOk={this.addEdithandleOk.bind(this)}
           onCancel={this.handleCancel}
-          width={600}
+          width={800}
         >
           {this.getUserAddEdit()}
         </Modal>
@@ -675,6 +861,15 @@ class Clubber extends Component {
           width={600}
         >
           <ClubberImport />
+        </Modal>
+        <Modal
+          title={this.state.detailData.name + "用户信息删除--先取消该用户预约订单"}
+          visible={this.state.clubberDeleteVisible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          width={1000}
+        >
+          <ClubberDelete />
         </Modal>
       </div>
     );
