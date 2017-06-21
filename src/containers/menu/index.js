@@ -7,12 +7,17 @@ const MenuItemGroup = Menu.ItemGroup;
 class LeftMenu extends Component {
   constructor(props, context) {
     super(props)
-    this.state = {}
+    this.state = {
+      currentKey: ""
+    }
   }
 
   componentWillMount () {
-    console.log(this.props.modle)
-    location.hash = "/" + MenuList[this.props.modle][0].key
+    let pathname = location.hash;
+    this.setState({
+      currentKey: pathname.substr(2, location.hash.indexOf("?"))
+    })
+    // location.hash = "/" + MenuList[this.props.modle][0].key
   }
 
   handleClick = (e) => {
@@ -53,7 +58,7 @@ class LeftMenu extends Component {
       <div className="left-menu">
         <Menu
           onClick={this.handleClick}
-          defaultSelectedKeys={[MenuList[this.props.modle][0].key]}
+          defaultSelectedKeys={this.state.currentKey}
           mode="inline"
         >
           {this.getMenuList()}

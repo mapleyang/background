@@ -115,7 +115,6 @@ class Header extends Component {
     // if(this.state.param !== "" && this.state.param !== param ) {
     //   location.reload();
     // }
-    console.log("test")
     let userInfo = sessionStorage.getItem("userInfo");
     return (
       <div className="header-area">

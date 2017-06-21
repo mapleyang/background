@@ -11,8 +11,6 @@ const UserInfo = {
         else {
           location.hash = "/login";
           sessionStorage.removeItem("userInfo")
-          if(data.errors[0].code === "sysSessionTimeout") {
-          }
         }
       },
       error:function(){

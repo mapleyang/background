@@ -68,11 +68,13 @@ const MenuList = {
     key: "reserve",
     icon: "appstore",
     title: "预约改约"
-  },{
-    key: "reserveexport",
-    icon: "appstore",
-    title: "预约导出"
-  },{
+  },
+  // {
+  //   key: "reserveexport",
+  //   icon: "appstore",
+  //   title: "预约导出"
+  // },
+  {
     key: "orgresimport",
     icon: "appstore",
     title: "排期名额导入"

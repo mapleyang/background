@@ -13,6 +13,7 @@ import ZH_EN from './zh-en';
 import { hashHistory, browserHistory, Router, Route, IndexRoute, IndexRedirect } from 'react-router'
 import 'antd/dist/antd.less'
 import Test from "./containers/test"
+import Test01 from "./containers/test/test01"
 import App from "./containers/app"
 import Home from "./containers/home/index"
 import Login from "./containers/login/index"
@@ -64,6 +65,7 @@ const ready = () => {
             <IndexRoute component={Home}/>
             <IndexRedirect to="/home" />
             <Route path="/test" component={Test}></Route>
+            <Route path="/test01" component={Test01}></Route>
             <Route path="/home" component={Home}></Route>
             <Route path="/en/home" component={Home}></Route>
             <Route path="/login" component={Login}></Route>

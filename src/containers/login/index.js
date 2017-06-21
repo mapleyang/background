@@ -13,7 +13,8 @@ class Login extends Component {
 	constructor(props, context) {
     super(props)
     this.state = {
-      error: ""
+      error: "",
+      loading: false
     }
   }
 
@@ -43,6 +44,9 @@ class Login extends Component {
                 content: '',
               });
             }
+            _this.setState({
+              loading: false
+            })
           },
           error:function(){
           }
@@ -63,19 +67,19 @@ class Login extends Component {
                 {getFieldDecorator('userName', {
                   rules: [{ required: true, message: 'Please input your username!' }],
                 })(
-                  <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="Username" />
+                  <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="请输入用户名" />
                 )}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('password', {
                   rules: [{ required: true, message: 'Please input your Password!' }],
                 })(
-                  <Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type="password" placeholder="Password" />
+                  <Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type="password" placeholder="请输入密码" />
                 )}
               </FormItem>
               <FormItem>
-                <Button type="primary" htmlType="submit" className="login-form-button">
-                  Log in
+                <Button type="primary" htmlType="submit" className="login-form-button" loading={this.state.loading}>
+                  登陆
                 </Button>
               </FormItem>
             </Form>
