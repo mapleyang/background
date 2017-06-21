@@ -35,7 +35,7 @@ class ClubberDelete extends Component {
     orderData.pageSize = 8;
     let orderUrl = "/chealth/background/cusServiceOperation/hcuReserve/searchData";
     Operate.getResponse(orderUrl, orderData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         _this.setState({
           orderList: value.data.rows,
           total: value.data.total,
@@ -51,7 +51,6 @@ class ClubberDelete extends Component {
   }
 
   operateClick (record, index) {
-    debugger
     const _this = this;
     this.setState({
       loading: true
@@ -66,7 +65,7 @@ class ClubberDelete extends Component {
       handelKbn: record.handleKbn,
     }
     Operate.getResponse(cancelOrderUrl, cancelOrderData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         message.success(record.recordId + "订单取消成功")
         let orderData = {
           cusId: this.state.detailData.cusId,

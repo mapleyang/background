@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Row, Col, Select, InputNumber, Button } from 'antd'
+import { Form, Row, Col, Select, InputNumber, Button, Checkbox} from 'antd'
 const FormItem = Form.Item;
 const modalItemLayout = {
   labelCol: { span: 8 },
@@ -69,7 +69,9 @@ const UserDetail = {
       key: 'certiId',
       dataIndex: "certiId",
       render: (text, record, index) => {
-        return <span>{record.certiTypeName + "：" + record.certiId}</span>
+        let certiTypeName = record.certiTypeName === null ? "" : record.certiTypeName + "：";
+        let certiId = record.certiId === null ? "" : record.certiId;
+        return <span>{certiTypeName + certiId}</span>
       },
     },{
       title: '员工/会员号',
@@ -161,7 +163,9 @@ const UserDetail = {
       key: 'certiId',
       dataIndex: "certiId",
       render: (text, record, index) => {
-        return <span>{record.certiTypeName + "：" + record.certiId}</span>
+        let certiTypeName = record.certiTypeName === null ? "" : record.certiTypeName + "：";
+        let certiId = record.certiId === null ? "" : record.certiId;
+        return <span>{certiTypeName + certiId}</span>
       },
     },{
       title: '员工/会员号',
@@ -373,17 +377,13 @@ const UserDetail = {
         </div>
       }
     }, {
-      title: '排期',
+      title: '团检日',
       dataIndex: 'groupHcuFlg',
       key: 'groupHcuFlg',
       width: 150,
       render: (text, record, index) => {
         return <div className="org-change-operate">
-          <Select defaultValue={record.groupHcuFlg} onChange={_this.dateFlagChange.bind(_this, record, index)}>
-            <Option value="0">工作日</Option>
-            <Option value="1">休息日</Option>
-            <Option value="2">团检日</Option>
-          </Select>
+          <Checkbox checked={record.groupHcuFlg} onChange={_this.groupHcuFlgChange.bind(_this, record, index)}>团检日</Checkbox>
         </div>
       }
     }, {

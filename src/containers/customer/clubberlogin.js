@@ -70,25 +70,27 @@ class ClubberLogin extends Component {
     let projectUrl = "/chealth/background/ajaxBusiness/loadCustProjectList"
     let projectData = {};
     Operate.getResponse(projectUrl, projectData, "POST", "html").then((value) => {
-      let clubberData = {
-        custProjectId: value.data[0].custProjectId,
-        pageNumber: 1,
-        accountStatus: this.state.accountStatus
+      if(value.success === "true") {
+        let clubberData = {
+          custProjectId: value.data[0].custProjectId,
+          pageNumber: 1,
+          accountStatus: this.state.accountStatus
+        }
+        _this.setState({
+          projectData: value.data,
+          projectValue: value.data[0].custProjectId,
+          projectName: value.data[0].projectName,
+          cusId: value.data[0].cusId,
+          condition: clubberData
+        })
+        //用户数据
+        _this.getClubberInfo(clubberData)
+        //产品服务
+        let serviceData = {
+          custProjectId: value.data[0].custProjectId
+        }
+        _this.getServiceInfo(serviceData, value.data[0].cusId)
       }
-      _this.setState({
-        projectData: value.data,
-        projectValue: value.data[0].custProjectId,
-        projectName: value.data[0].projectName,
-        cusId: value.data[0].cusId,
-        condition: clubberData
-      })
-      //用户数据
-      _this.getClubberInfo(clubberData)
-      //产品服务
-      let serviceData = {
-        custProjectId: value.data[0].custProjectId
-      }
-      _this.getServiceInfo(serviceData, value.data[0].cusId)
     }, (value) => {})
     /*获取身份证号*/
     Condition.getIdCardType(_this)
@@ -102,7 +104,7 @@ class ClubberLogin extends Component {
     data.pageSize = 10;
     let clubberUrl = "/chealth/background/cusServiceOperation/memberInfo/searchData";
     Operate.getResponse(clubberUrl, data, "POST", "html").then((clubber) => {
-      if(clubber.success) {
+      if(clubber.success === "true") {
         _this.setState({
           data: clubber.data.rows,
           total: clubber.data.total,
@@ -122,7 +124,7 @@ class ClubberLogin extends Component {
     const _this = this;
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
-      if(service.success) {
+      if(service.success === "true") {
         let serviceobject = DataUtil.getServiceObject(service.data.list[0].value)
         _this.setState({
           serviceList: service.data.list,
@@ -143,7 +145,7 @@ class ClubberLogin extends Component {
     const _this = this;
     let clubberOrgUrl = "/chealth/background/ajaxBusiness/loadCustInstitutionsList";
     Operate.getResponse(clubberOrgUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -179,7 +181,7 @@ class ClubberLogin extends Component {
         memberId: record.memberId,
       }
       Operate.getResponse(userDetailUrl, userDetailData, "POST", "html").then((value) => {
-        if(value.success) {
+        if(value.success === "true") {
           _this.setState({
             userDetail: value.data
           })
@@ -251,7 +253,7 @@ class ClubberLogin extends Component {
         }
         let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberLogin/saveEdit";
         Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
-          if(value.success) {
+          if(value.success === "true") {
             message.success(this.state.detailData.name + "登陆重置成功！");
             _this.getClubberInfo(_this.state.condition)
           }
@@ -407,7 +409,7 @@ class ClubberLogin extends Component {
       data.parplmId = selectedOptions[0].value;
       let cityUrl = "/chealth/background/ajaxBusiness/loadCustCityListInParplm";
       Operate.getResponse(cityUrl, data, "POST", "html").then((value) => {
-        if(value.success) {
+        if(value.success === "true") {
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -597,7 +599,7 @@ class ClubberLogin extends Component {
       }
       Operate.getResponse(departmentUrl, departmentData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -655,7 +657,7 @@ class ClubberLogin extends Component {
                     labelCol = {{ span: 6 }}
                     wrapperCol = {{ span: 14 }}
                     label="用户姓名">
-                    <Input onChange={this.staffChange} value={this.state.staffNameValue} />
+                    <Input placeholder="请输入用户姓名" onChange={this.staffChange} value={this.state.staffNameValue} />
                   </FormItem>
                 </Col>
               </Row>
@@ -664,28 +666,28 @@ class ClubberLogin extends Component {
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="登陆账号：">                  
-                    <Input onChange={this.countLoginChange} value={this.state.loginAccount}/>
+                  label="登陆账号">                  
+                    <Input placeholder="请输入登陆账号" onChange={this.countLoginChange} value={this.state.loginAccount}/>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="手机号：">   
-                  <Input onChange={this.mobileChange} value={this.state.mobile}/>
+                  label="手机号">   
+                  <Input placeholder="请输入手机号" onChange={this.mobileChange} value={this.state.mobile}/>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   labelCol = {{ span: 6 }}
                   wrapperCol = {{ span: 14 }}
-                  label="身份证件号："
+                  label="身份证件号"
                   className="item-idCard">   
                   <InputGroup compact>
                     <Select value={this.state.idCardTypeValue} onChange={this.idCardTypeChange.bind(this)}>
                       {this.getIdCardTypeOption("condition")}
                     </Select>
-                    <Input style={{ width: '68%' }} onChange={this.idCardChange} value={this.state.idCardValue} />
+                    <Input placeholder="请输入证件号" style={{ width: '68%' }} onChange={this.idCardChange} value={this.state.idCardValue} />
                   </InputGroup> 
                 </FormItem>
               </Col>

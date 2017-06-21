@@ -71,7 +71,7 @@ class ClubberImport extends Component {
     const _this = this;
     let groupUrl = "/chealth/background/ajaxBusiness/loadCustHcuGrouptList";
     Operate.getResponse(groupUrl, groupData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {

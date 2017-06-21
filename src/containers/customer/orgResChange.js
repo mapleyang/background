@@ -80,7 +80,7 @@ class OrgResChange extends Component {
     //项目接口
     let projectUrl = "/chealth/background/ajaxBusiness/loadCustProjectList";
     Operate.getResponse(projectUrl, "", "GET", "json").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let orgUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarEdit/searchData";
         //产品服务
         let serviceData = {
@@ -102,7 +102,7 @@ class OrgResChange extends Component {
     const _this = this;
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
-      if(service.success) {
+      if(service.success === "true") {
         let serviceObject = DataUtil.getServiceObject(service.data.list[0].value)
         //用户机构组织
         let data = {
@@ -139,7 +139,7 @@ class OrgResChange extends Component {
     groupOrgData.pageSize = 10;
     let groupOrgUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarModify/searchData";
     Operate.getResponse(groupOrgUrl, groupOrgData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         if(value.data.rows.length) {
           value.data.rows.forEach(el => {
@@ -162,7 +162,7 @@ class OrgResChange extends Component {
     const _this = this;
     let groupUrl = "/chealth/background/ajaxBusiness/loadCustHcuGrouptList";
     Operate.getResponse(groupUrl, groupData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -189,7 +189,7 @@ class OrgResChange extends Component {
     const _this = this;
     let provinceUrl = "/chealth/background/ajaxBusiness/loadCustParplmList";
     Operate.getResponse(provinceUrl, provinceData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -226,7 +226,7 @@ class OrgResChange extends Component {
     const _this = this;
     let groupOrgdetailUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarModify/searchData";
     Operate.getResponse(groupOrgdetailUrl, groupOrgdetailData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = value.data.rows.map(el => {
           el.projectName = record.projectName;
           return el
@@ -374,7 +374,7 @@ class OrgResChange extends Component {
       }
       Operate.getResponse(institutionUrl, institutionData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -402,7 +402,7 @@ class OrgResChange extends Component {
     const _this = this;
     let institutionUrl = "/chealth/background/ajaxBusiness/loadCustHcuInstitutionsInGroup";
     Operate.getResponse(institutionUrl, institutionData, "POST", "html").then((value) => {
-      if(value.success){
+      if(value.success === "true"){
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -461,7 +461,7 @@ class OrgResChange extends Component {
       }
       Operate.getResponse(cityUrl, cityData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -533,6 +533,14 @@ class OrgResChange extends Component {
     })
   }
 
+  groupHcuFlgChange (record, index, e) {
+    let data = this.state.data;
+    data[index].groupHcuFlg = e.target.checked ? 1 : 0;
+    this.setState({
+      data: data
+    })
+  }
+
   /*已预约人数修改*/
   reservedChange (record, index, value) {
     let data = this.state.data;
@@ -555,7 +563,9 @@ class OrgResChange extends Component {
   tableSaveClick (record, index) {
     const _this = this;
     let saveUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarModify/saveEdit";
-    let jsonList = JSON.stringify([this.state.data[index]]);
+    let itemData = this.state.data[index];
+    itemData.groupHcuFlg = itemData.groupHcuFlg.toString();
+    let jsonList = JSON.stringify([itemData]);
     let saveData = {
       jsonList: jsonList
     }

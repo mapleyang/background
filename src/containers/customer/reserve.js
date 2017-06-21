@@ -84,16 +84,18 @@ class Reserve extends Component {
     let projectUrl = "/chealth/background/ajaxBusiness/loadCustProjectList"
     let projectData = {};
     Operate.getResponse(projectUrl, projectData, "POST", "html").then((value) => {
-      _this.setState({
-        projectData: value.data,
-        cusId: value.data[0].cusId,
-        custProjectId: value.data[0].custProjectId
-      })
-      //产品服务
-      let serviceData = {
-        custProjectId: value.data[0].custProjectId,
+      if(value.success === "true") {
+        _this.setState({
+          projectData: value.data,
+          cusId: value.data[0].cusId,
+          custProjectId: value.data[0].custProjectId
+        })
+        //产品服务
+        let serviceData = {
+          custProjectId: value.data[0].custProjectId,
+        }
+        _this.getServiceInfo(serviceData, value.data[0].cusId)
       }
-      _this.getServiceInfo(serviceData, value.data[0].cusId)
     }, (value) => {
     })
     //身份证类型
@@ -105,7 +107,7 @@ class Reserve extends Component {
     let idCardTypeUrl = "/chealth/background/ajaxBusiness/loadCertiTypeList";
     let idCardTypeData = {};
     Operate.getResponse(idCardTypeUrl, idCardTypeData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         if(value.data.list.length) {
           value.data.list.forEach(el => {
@@ -130,7 +132,7 @@ class Reserve extends Component {
     const _this = this;
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
-      if(service.success) {
+      if(service.success === "true") {
         //预约信息查询
         let serviceObject = DataUtil.getServiceObject(service.data.list[0].value)
         let orderData = {
@@ -166,7 +168,7 @@ class Reserve extends Component {
     let orderUrl = "/chealth/background/cusServiceOperation/hcuReserve/searchData";
     orderData.pageSize = 10;
     Operate.getResponse(orderUrl, orderData, "POST", "html").then((order) => {
-      if(order.success) {
+      if(order.success === "true") {
         _this.setState({
           data: order.data.rows,
           reserveTotal: order.data.total
@@ -183,7 +185,7 @@ class Reserve extends Component {
     const _this = this;
     let clubberOrgUrl = "/chealth/background/ajaxBusiness/loadCustInstitutionsList";
     Operate.getResponse(clubberOrgUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -277,7 +279,7 @@ class Reserve extends Component {
             handelKbn: record.handleKbn          //执行区分          
           }
           return Operate.getResponse(url, data, "POST", "html").then(function(value){
-            if(value.success) {
+            if(value.success === "true") {
               message.success(record.grouprecordId + "订单删除成功");
             }
             else {
@@ -301,7 +303,7 @@ class Reserve extends Component {
     const _this = this;
     let provinceUrl = "/chealth/background/ajaxBusiness/loadCustParplmList"
     Operate.getResponse(provinceUrl, provinceData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -386,7 +388,7 @@ class Reserve extends Component {
       let cityUrl = "/chealth/background/ajaxBusiness/loadCustCityListInParplm";
       Operate.getResponse(cityUrl, data, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success) {
+        if(value.success === "true") {
           let list = [];
           value.data.list.map(el => {
             if(el.value) {
@@ -411,7 +413,7 @@ class Reserve extends Component {
       data.parplmId = selectedOptions[selectedOptions.length - 1].value;
       let countyUrl = "/chealth/background/ajaxBusiness/loadCustCityListInParplm"
       Operate.getResponse(countyUrl, data, "POST", "html").then((value) => {
-        if(value.success) {
+        if(value.success === "true") {
 
         }
       }, (value) => {});
@@ -741,7 +743,7 @@ class Reserve extends Component {
       }
       Operate.getResponse(departmentUrl, departmentData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -1149,7 +1151,7 @@ class Reserve extends Component {
     const _this = this;
     let institutionUrl = "/chealth/background/cusServiceOperation/hcuReserve/loadCusHcuInstitutionList";
     Operate.getResponse(institutionUrl, institutionData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         if(value.data.list.length) {
           let state = {
             institutionOptions: value.data.list
@@ -1184,7 +1186,7 @@ class Reserve extends Component {
     })
     let institutionDetailUrl = "/chealth/background/cusServiceOperation/hcuReserve/loadCusHcuInstitutionInfo";
     Operate.getResponse(institutionDetailUrl, data, "POST", "html").then((institution) => {
-      if(institution.success) {
+      if(institution.success === "true") {
         _this.setState({
           institutionInfo: institution.data
         })
@@ -1204,7 +1206,7 @@ class Reserve extends Component {
     }
     let reserveDateUrl = "/chealth/background/cusServiceOperation/hcuReserve/loadCusHcuInstitutionPermissionDate";
     Operate.getResponse(reserveDateUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         if(value.data.list.length) {
           _this.setState({
             reserveDateList: value.data.list

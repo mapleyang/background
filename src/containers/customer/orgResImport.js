@@ -75,7 +75,7 @@ class OrgResImport extends Component {
     //项目接口
     let projectUrl = "/chealth/background/ajaxBusiness/loadCustProjectList";
     Operate.getResponse(projectUrl, "", "GET", "json").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         //产品服务
         let serviceData = {
           custProjectId : value.data[0].custProjectId,        // 项目ID
@@ -96,7 +96,7 @@ class OrgResImport extends Component {
     const _this = this;
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
-      if(service.success) {
+      if(service.success === "true") {
         let serviceObject = DataUtil.getServiceObject(service.data.list[0].value)
         let groupOrgData = {
           custProjectId : serviceData.custProjectId,        // 项目ID
@@ -137,7 +137,7 @@ class OrgResImport extends Component {
     groupOrgData.pageSize = 10;
     let groupOrgUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarEdit/searchData";
     Operate.getResponse(groupOrgUrl, groupOrgData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         _this.setState({
           data: value.data.rows,
           groupOrgTotal: value.data.total
@@ -153,7 +153,7 @@ class OrgResImport extends Component {
     const _this = this;
     let groupUrl = "/chealth/background/ajaxBusiness/loadCustHcuGrouptList";
     Operate.getResponse(groupUrl, groupData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -172,7 +172,7 @@ class OrgResImport extends Component {
     const _this = this;
     let provinceUrl = "/chealth/background/ajaxBusiness/loadCustParplmList";
     Operate.getResponse(provinceUrl, provinceData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -209,7 +209,7 @@ class OrgResImport extends Component {
     const _this = this;
     let groupOrgdetailUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarModify/searchData";
     Operate.getResponse(groupOrgdetailUrl, groupOrgdetailData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = value.data.rows.map(el => {
           el.projectName = record.projectName;
           return el
@@ -409,7 +409,7 @@ class OrgResImport extends Component {
       }
       Operate.getResponse(institutionUrl, institutionData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -461,7 +461,7 @@ class OrgResImport extends Component {
       }
       Operate.getResponse(cityUrl, cityData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {

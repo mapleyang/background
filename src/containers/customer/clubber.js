@@ -77,29 +77,31 @@ class Clubber extends Component {
     let projectUrl = "/chealth/background/ajaxBusiness/loadCustProjectList"
     let projectData = {};
     Operate.getResponse(projectUrl, projectData, "POST", "html").then((value) => {
-      let condition = {
-        custProjectId: value.data[0].custProjectId,
-        accountStatus: "02",
-        pageNumber: 1,
+      if(value.success === "true") {
+        let condition = {
+          custProjectId: value.data[0].custProjectId,
+          accountStatus: "02",
+          pageNumber: 1,
+        }
+        _this.setState({
+          projectData: value.data,
+          projectValue: value.data[0].custProjectId,
+          projectName: value.data[0].projectName,
+          cusId: value.data[0].cusId,
+          condition: condition
+        })
+        //用户数据
+        let clubberData = {
+          custProjectId: value.data[0].custProjectId,
+          pageNumber: 1,
+        }
+        _this.getClubberInfo(clubberData)
+        //产品服务
+        let serviceData = {
+          custProjectId: value.data[0].custProjectId
+        }
+        _this.getServiceInfo(serviceData, value.data[0].cusId)
       }
-      _this.setState({
-        projectData: value.data,
-        projectValue: value.data[0].custProjectId,
-        projectName: value.data[0].projectName,
-        cusId: value.data[0].cusId,
-        condition: condition
-      })
-      //用户数据
-      let clubberData = {
-        custProjectId: value.data[0].custProjectId,
-        pageNumber: 1,
-      }
-      _this.getClubberInfo(clubberData)
-      //产品服务
-      let serviceData = {
-        custProjectId: value.data[0].custProjectId
-      }
-      _this.getServiceInfo(serviceData, value.data[0].cusId)
     }, (value) => {})
     /*获取身份证号*/
     Condition.getIdCardType(_this)
@@ -113,7 +115,7 @@ class Clubber extends Component {
     data.pageSize = 10;
     let clubberUrl = "/chealth/background/cusServiceOperation/memberInfo/searchData";
     Operate.getResponse(clubberUrl, data, "POST", "html").then((clubber) => {
-      if(clubber.success) {
+      if(clubber.success === "true") {
         _this.setState({
           data: clubber.data.rows,
           total: clubber.data.total,
@@ -133,7 +135,7 @@ class Clubber extends Component {
     const _this = this;
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
-      if(service.success) {
+      if(service.success === "true") {
         let serviceObject = DataUtil.getServiceObject(service.data.list[0].value);
         _this.setState({
           serviceList: service.data.list,
@@ -157,7 +159,7 @@ class Clubber extends Component {
     const _this = this;
     let clubberOrgUrl = "/chealth/background/ajaxBusiness/loadCustInstitutionsList";
     Operate.getResponse(clubberOrgUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -198,7 +200,9 @@ class Clubber extends Component {
         workCity: record.workCity,
         workPosition: record.workPosition,
         cusDepartmentId: record.department,
-        birth: moment(record.birth, dateFormat)
+        birth: moment(record.birth, dateFormat),
+        memberNo: record.memberNo,
+        accountStatus: this.state.accountStatus
       }
       this.props.form.setFieldsValue(data)
     }
@@ -281,22 +285,32 @@ class Clubber extends Component {
           }
         }
         if(_this.state.operateFlag === "edit") {
+          data.cusId = _this.state.cusId;
           let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberInfo/saveEdit";
           Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
-            if(value.success) {
+            if(value.success === "true") {
               _this.setState({
                 addEditVisible: false
               })
+              message.success("用户编辑成功！")
+            }
+            else {
+              message.error("用户编辑失败！")
             }
           }, (value) => {})
         }
         else {
+          data.custProjectId = _this.state.projectValue;
           let clubberAddUrl = "/chealth/background/cusServiceOperation/memberInfo/saveCreate";
           Operate.getResponse(clubberAddUrl, data, "POST", "html").then((value) => {
-            if(value.success) {
+            if(value.success === "true") {
               _this.setState({
                 addEditVisible: false
               })
+              message.success("用户新增成功！")
+            }
+            else{
+              message.error("用户新增失败！")
             }
           }, (value) => {})
         }
@@ -345,7 +359,7 @@ class Clubber extends Component {
       handelKbn: record.handleKbn,
     }
     Operate.getResponse(cancelOrderUrl, cancelOrderData, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         message.success(record.recordId + "订单取消成功")
       }
       else {
@@ -370,7 +384,7 @@ class Clubber extends Component {
         deleteConfirmLoading: false,
         clubberDeleteVisible: false,
       })  
-      if(value.success) {
+      if(value.success === "true") {
         message.success("删除" + this.state.detailData.name + "成功！")
       }
       else {
@@ -590,7 +604,7 @@ class Clubber extends Component {
                 {...modalItemLayout}
                 label="员工/会员号"
                 hasFeedback>    
-                {getFieldDecorator('belongMemberId', {
+                {getFieldDecorator('memberNo', {
                     rules: [{ required: true, message: '请输入员工号或会员号' }],
                   })(
                   <Input placeholder="员工号或会员号" />
@@ -751,7 +765,7 @@ class Clubber extends Component {
       data.parplmId = selectedOptions[0].value;
       let cityUrl = "/chealth/background/ajaxBusiness/loadCustCityListInParplm";
       Operate.getResponse(cityUrl, data, "POST", "html").then((value) => {
-        if(value.success) {
+        if(value.success === "true") {
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -819,7 +833,7 @@ class Clubber extends Component {
     }
     let provinceUrl = "/chealth/background/ajaxBusiness/loadCustParplmList";
     Operate.getResponse(provinceUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -835,7 +849,7 @@ class Clubber extends Component {
     /*获取工作职位*/
     let workPositionUrl = "/chealth/background/ajaxBusiness/loadCustWorkPositionsList";
     Operate.getResponse(workPositionUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -850,7 +864,7 @@ class Clubber extends Component {
     /*获取工作城市*/
     let workCityUrl = "/chealth/background/ajaxBusiness/loadCustWorkCitiesList"
     Operate.getResponse(workCityUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -865,7 +879,7 @@ class Clubber extends Component {
     /*获取团体机构*/
     let institutionsUrl = "/chealth/background/ajaxBusiness/loadCustInstitutionsList"
     Operate.getResponse(institutionsUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -880,7 +894,7 @@ class Clubber extends Component {
     /*获取团体机构-组织*/
     let departmentsUrl = "/chealth/background/ajaxBusiness/loadCustDepartmentsList"
     Operate.getResponse(departmentsUrl, data, "POST", "html").then((value) => {
-      if(value.success) {
+      if(value.success === "true") {
         let list = [];
         value.data.list.forEach(el => {
           if(el.value) {
@@ -1054,7 +1068,7 @@ class Clubber extends Component {
       }
       Operate.getResponse(departmentUrl, departmentData, "POST", "html").then((value) => {
         targetOption.loading = false;
-        if(value.success){
+        if(value.success === "true"){
           let list = [];
           value.data.list.forEach(el => {
             if(el.value) {
@@ -1112,7 +1126,7 @@ class Clubber extends Component {
                     labelCol = {{ span: 6 }}
                     wrapperCol = {{ span: 14 }}
                     label="用户姓名">
-                    <Input onChange={this.staffChange} value={this.state.staffNameValue} />
+                    <Input placeholder="请输入用户姓名" onChange={this.staffChange} value={this.state.staffNameValue} />
                   </FormItem>
                 </Col>
               </Row>
@@ -1121,28 +1135,28 @@ class Clubber extends Component {
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="登陆账号：">                  
-                    <Input onChange={this.countLoginChange} value={this.state.loginAccount}/>
+                  label="登陆账号">                  
+                    <Input placeholder="请输入登陆账号" onChange={this.countLoginChange} value={this.state.loginAccount}/>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
-                  label="手机号：">   
-                  <Input onChange={this.mobileChange} value={this.state.mobile}/>
+                  label="手机号">   
+                  <Input placeholder="请输入手机号" onChange={this.mobileChange} value={this.state.mobile}/>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   labelCol = {{ span: 6 }}
                   wrapperCol = {{ span: 14 }}
-                  label="身份证件号："
+                  label="身份证件号"
                   className="item-idCard">   
                   <InputGroup compact>
                     <Select value={this.state.idCardTypeValue} onChange={this.idCardTypeChange.bind(this)}>
                       {this.getIdCardTypeOption("condition")}
                     </Select>
-                    <Input style={{ width: '68%' }} onChange={this.idCardChange} value={this.state.idCardValue} />
+                    <Input placeholder="请输入证件号" style={{ width: '68%' }} onChange={this.idCardChange} value={this.state.idCardValue} />
                   </InputGroup> 
                 </FormItem>
               </Col>
