@@ -43,6 +43,8 @@ class ClubberImport extends Component {
       }
       this.getServiceGroup(data);
     }
+    console.log(this.props.serviceList)
+    console.log(this.props.custPscId)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -80,13 +82,14 @@ class ClubberImport extends Component {
         })
         _this.setState({
           groupList: list,
-          groupValue: list[0].value
+          groupValue: list.length ? list[0].value : ""
         })
       }
     }, (value) => {})
   }
 
   serviceChange (value) {
+    console.log(value)
     this.setState({
       custPscId: value
     })
@@ -116,7 +119,7 @@ class ClubberImport extends Component {
         label="产品服务">                  
           <Select value={this.state.custPscId} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
             {this.state.serviceList.map(el => {
-              return <Option value={el.value}>{el.label}</Option>
+              return <Option value={el.custPscId}>{el.label}</Option>
             })}
           </Select>
       </FormItem>
@@ -214,7 +217,7 @@ class ClubberImport extends Component {
                   label="产品服务">                  
                     <Select value={this.state.custPscId} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
                       {this.state.serviceList.map(el => {
-                        return <Option value={el.value}>{el.label}</Option>
+                        return <Option value={el.custPscId}>{el.label}</Option>
                       })}
                     </Select>
                 </FormItem>

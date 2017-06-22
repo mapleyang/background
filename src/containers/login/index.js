@@ -36,7 +36,7 @@ class Login extends Component {
             let data = JSON.parse(res)
             if(data.success === "true") {
               sessionStorage.setItem("userInfo", res)
-              location.hash = "/clubber"                  
+              location.hash = "/clubberinfo"                  
             }
             else {
               Modal.error({

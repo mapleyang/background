@@ -50,7 +50,6 @@ class ClubberLogin extends Component {
       idCardValue: "",
       cusId: "",
       serviceList: [],
-      serviceValue: "",
       custPscId: "",
       orgSelectValue: [],
       projectName: "",
@@ -125,19 +124,25 @@ class ClubberLogin extends Component {
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
       if(service.success === "true") {
-        let serviceobject = DataUtil.getServiceObject(service.data.list[0].value)
-        _this.setState({
-          serviceList: service.data.list,
-          custPscId: serviceobject.custPscId,
-          psc: serviceobject.psc,
-          serviceValue: service.data.list[0].value
-        })
-        //用户机构组织
-        let clubberOrgData = {
-          cusId: cusId,
-          custPscId: serviceobject.custPscId
+        if(service.data.list.length) {
+          let list = service.data.list.map(el => {
+            let serviceObject = DataUtil.getServiceObject(el.value);
+            el.custPscId = serviceObject.custPscId;
+            el.cusId = serviceObject.cusId;
+            return el
+          })
+          _this.setState({
+            serviceList: list,
+            custPscId: list[0].custPscId,
+            psc: list[0].psc,
+          })
+          //用户机构组织
+          let clubberOrgData = {
+            cusId: cusId,
+            custPscId: list[0].custPscId
+          }
+          _this.getClubberOrgInfo(clubberOrgData);
         }
-        _this.getClubberOrgInfo(clubberOrgData);
       }
     }, (service) => {})
   }
@@ -315,7 +320,7 @@ class ClubberLogin extends Component {
     const { getFieldDecorator } = this.props.form;
     let serviceName = "";
     this.state.serviceList.forEach(el => {
-      if(el.value === this.state.serviceValue) {
+      if(el.custPscId === this.state.custPscId) {
         serviceName = el.label;
       }
     })
@@ -452,7 +457,6 @@ class ClubberLogin extends Component {
       idCardValue: "",
       custPscId: "",
       psc: "",
-      serviceValue: "",
       orgSelectValue: [],
       projectValue: this.state.projectData[0].custProjectId,
       condition: data
@@ -552,15 +556,19 @@ class ClubberLogin extends Component {
   /*产品服务选择事件*/
   serviceChange (value) {
     let data = this.state.condition;
-    let serviceObject = DataUtil.getServiceObject(value)
-    data.custPscId = serviceObject.custPscId;
+    data.custPscId = value;
     data.cusInstitutionId = "";
     data.cusDepartmentId = "";
+    let psc = "";
+    this.state.serviceList.forEach(el => {
+      if(value === el.custPscId) {
+        psc = el.psc;
+      }
+    })
     let clubberOrgData = {
       cusId: this.state.cusId,
-      custPscId: serviceObject.custPscId,
-      psc: serviceObject.psc,
-      serviceValue: value
+      custPscId: value,
+      psc: psc,
     }
     this.setState({
       custPscId: value,
@@ -645,9 +653,9 @@ class ClubberLogin extends Component {
                    <FormItem
                     {...formItemLayout}
                     label="产品服务：">                  
-                      <Select value={this.state.serviceValue} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
+                      <Select value={this.state.custPscId} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
                         {this.state.serviceList.map(el => {
-                          return <Option value={el.value}>{el.label}</Option>
+                          return <Option value={el.custPscId}>{el.label}</Option>
                         })}
                       </Select>
                   </FormItem>

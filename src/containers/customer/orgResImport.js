@@ -49,7 +49,6 @@ class OrgResImport extends Component {
       areaList: [],
       areaValue: [],
       serviceList: [],
-      serviceValue: "",
       custPscId: "",
       custProjectId: "",
       cusId: "",
@@ -97,24 +96,30 @@ class OrgResImport extends Component {
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
       if(service.success === "true") {
-        let serviceObject = DataUtil.getServiceObject(service.data.list[0].value)
-        let groupOrgData = {
-          custProjectId : serviceData.custProjectId,        // 项目ID
-          custPscId: serviceObject.custPscId,
-          pageNumber: 1
+        if(service.data.list.length) {
+          let list = service.data.list.map(el => {
+            let serviceObject = DataUtil.getServiceObject(el.value)
+            el.custPscId = serviceObject.custPscId;
+            el.psc = serviceObject.psc;
+            return el
+          })
+          let groupOrgData = {
+            custProjectId : serviceData.custProjectId,        // 项目ID
+            custPscId: list[0].custPscId,
+            pageNumber: 1
+          }
+          let data = {
+            cusId: cusId,
+            custPscId: list[0].custPscId
+          }
+          this.commonsReq(groupOrgData, data)
+          _this.setState({
+            serviceList: list,
+            custPscId: list[0].custPscId,
+            psc: list[0].psc,
+            condition: groupOrgData,
+          })
         }
-        let data = {
-          cusId: cusId,
-          custPscId: serviceObject.custPscId
-        }
-        this.commonsReq(groupOrgData, data)
-        _this.setState({
-          serviceList: service.data.list,
-          custPscId: serviceObject.custPscId,
-          psc: serviceObject.psc,
-          condition: groupOrgData,
-          serviceValue: service.data.list[0].value
-        })
       }
     }, (service) => {})
   }
@@ -330,7 +335,6 @@ class OrgResImport extends Component {
       areaValue: [],
       custPscId: "",
       psc: "",
-      serviceValue: "",
       custProjectId: this.state.projectData[0].custProjectId
     })
     this.getGroupOrgInfo(data)
@@ -486,19 +490,22 @@ class OrgResImport extends Component {
 
   /*产品服务事件*/
   serviceChange (value) {
-    let serviceObject = DataUtil.getServiceObject(value)
     let data = {
       custProjectId: this.state.condition.custProjectId,
-      custPscId: serviceObject.custPscId
+      custPscId: value
     }
-    data.custPscId = value;
+    let psc = "";
+    this.state.serviceList.forEach(el => {
+      if(el.custPscId === value) {
+        psc = el.psc;
+      }
+    })
     this.setState({
-      custPscId: serviceObject.custPscId,
-      psc: serviceObject.psc,
+      custPscId: value,
+      psc: psc,
       condition: data,
       groupValue: "",
       areaValue: "",
-      serviceValue: value
     })
     let commonsData = {
       cusId: this.state.cusId,
@@ -572,12 +579,12 @@ class OrgResImport extends Component {
                   {...firstFormItemLayout}
                     label="产品服务"> 
                     <Select 
-                      value={this.state.serviceValue} 
+                      value={this.state.custPscId} 
                       style={{ width: "100%" }} 
                       onChange={this.serviceChange.bind(this)}
                       placeholder="请选择产品服务">                 
                       {this.state.serviceList.map(el => {
-                        return <Option value={el.value}>{el.label}</Option>
+                        return <Option value={el.custPscId}>{el.label}</Option>
                       })}
                     </Select>
                   </FormItem>

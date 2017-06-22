@@ -57,7 +57,7 @@ const MenuList = {
     title: "项目管理"
   }],
   customerService: [{
-    key: "clubber",
+    key: "clubberinfo",
     icon: "appstore",
     title: "用户信息"
   },{

@@ -57,7 +57,6 @@ class Clubber extends Component {
       orderList: [],
       cusId: "",
       serviceList: [],
-      serviceValue: "",
       custPscId: "",
       orgSelectValue: [],
       projectName: "",
@@ -136,22 +135,29 @@ class Clubber extends Component {
     let serviceUrl = "/chealth/background/ajaxBusiness/loadCustPsc";
     Operate.getResponse(serviceUrl, serviceData, "POST", "html").then((service) => {
       if(service.success === "true") {
-        let serviceObject = DataUtil.getServiceObject(service.data.list[0].value);
-        _this.setState({
-          serviceList: service.data.list,
-          custPscId: serviceObject.custPscId,
-          psc: serviceObject.psc,
-          serviceValue: service.data.list[0].value
-        })
-        //用户机构组织
-        let clubberOrgData = {
-          cusId: cusId,
-          custPscId: serviceObject.custPscId
+        if(service.data.list.length) {
+          let list = service.data.list.map(el => {
+            let serviceObject = DataUtil.getServiceObject(el.value);
+            el.custPscId = serviceObject.custPscId;
+            el.cusId = serviceObject.cusId;
+            return el;
+          })
+          let serviceObject = DataUtil.getServiceObject(service.data.list[0].value);
+          _this.setState({
+            serviceList: list,
+            custPscId: list[0].custPscId,
+            psc: list[0].psc,
+          })
+          //用户机构组织
+          let clubberOrgData = {
+            cusId: cusId,
+            custPscId: list[0].custPscId
+          }
+          _this.getClubberOrgInfo(clubberOrgData);
+          let clubberData = _this.state.condition;
+          clubberData.custPscId = list[0].custPscId;
+          _this.getClubberInfo(clubberData)
         }
-        _this.getClubberOrgInfo(clubberOrgData);
-        let clubberData = _this.state.condition;
-        clubberData.custPscId = serviceObject.custPscId;
-        _this.getClubberInfo(clubberData)
       }
     }, (service) => {})
   }
@@ -468,7 +474,7 @@ class Clubber extends Component {
     const { getFieldDecorator } = this.props.form;
     let serviceName = "";
     this.state.serviceList.forEach(el => {
-      if(el.value === this.state.serviceValue) {
+      if(el.custPscId === this.state.custPscId) {
         serviceName = el.label;
       }
     })
@@ -809,7 +815,6 @@ class Clubber extends Component {
       orgSelectValue: [],
       custPscId: "",
       psc: "",
-      serviceValue: "",
       projectValue: this.state.projectData[0].custProjectId,
       condition: data
     });
@@ -1022,20 +1027,26 @@ class Clubber extends Component {
   /*产品服务选择事件*/
   serviceChange (value) {
     let data = this.state.condition;
-    let serviceObject = DataUtil.getServiceObject(value)
-    data.custPscId = serviceObject.custPscId;
+    data.custPscId = value;
     data.cusInstitutionId = "";
     data.cusDepartmentId = "";
     let clubberOrgData = {
       cusId: this.state.cusId,
-      custPscId: serviceObject.custPscId,
+      custPscId: value,
     }
+    let psc = "";
+    this.state.serviceList.map(el => {
+      if(el.custPscId === value) {
+        psc = el.cusId;
+      }
+    })
     this.setState({
-      custPscId: serviceObject.custPscId,
-      psc: serviceObject.psc,
+      custPscId: value,
+      psc: psc,
       condition: data,
       orgSelectValue: [],
     })
+
     this.getClubberInfo(data);
     this.getClubberOrgInfo(clubberOrgData);
   }
@@ -1114,9 +1125,9 @@ class Clubber extends Component {
                    <FormItem
                     {...formItemLayout}
                     label="产品服务">                  
-                      <Select value={this.state.serviceValue} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
+                      <Select value={this.state.custPscId} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
                         {this.state.serviceList.map(el => {
-                          return <Option value={el.value}>{el.label}</Option>
+                          return <Option value={el.custPscId}>{el.label}</Option>
                         })}
                       </Select>
                   </FormItem>
