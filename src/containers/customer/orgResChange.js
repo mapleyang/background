@@ -535,7 +535,7 @@ class OrgResChange extends Component {
 
   groupHcuFlgChange (record, index, e) {
     let data = this.state.data;
-    data[index].groupHcuFlg = e.target.checked ? 1 : 0;
+    data[index].groupHcuFlg = e.target.checked ? "1" : "0";
     this.setState({
       data: data
     })

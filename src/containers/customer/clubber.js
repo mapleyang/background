@@ -112,8 +112,14 @@ class Clubber extends Component {
       tableLoading: true
     })
     data.pageSize = 10;
+    let reqData = {};
+    for(let key in data) {
+      if(data[key]) {
+        reqData[key] = data[key];
+      }
+    }
     let clubberUrl = "/chealth/background/cusServiceOperation/memberInfo/searchData";
-    Operate.getResponse(clubberUrl, data, "POST", "html").then((clubber) => {
+    Operate.getResponse(clubberUrl, reqData, "POST", "html").then((clubber) => {
       if(clubber.success === "true") {
         _this.setState({
           data: clubber.data.rows,
@@ -292,6 +298,7 @@ class Clubber extends Component {
         }
         if(_this.state.operateFlag === "edit") {
           data.cusId = _this.state.cusId;
+          data.memberId = _this.state.detailData.memberId;
           let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberInfo/saveEdit";
           Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
             if(value.success === "true") {
@@ -976,7 +983,7 @@ class Clubber extends Component {
       if(this.state.idCardType.length !== 0) {
         this.state.idCardType.forEach(el => {
           if(el.value !== "") {
-            item.push(<Option value={el.value}>{el.label}</Option>)
+            item.push(<Option value={el.value} key={el.value}>{el.label}</Option>)
           }
         })
       }
@@ -987,7 +994,7 @@ class Clubber extends Component {
           if(el.value === "") {
             return <Option value="">全部</Option>
           }
-          return <Option value={el.value}>{el.label}</Option>
+          return <Option value={el.value} key={el.value}>{el.label}</Option>
         })
       }
       else {
@@ -1116,7 +1123,7 @@ class Clubber extends Component {
                     label="项目名称">
                     <Select value={this.state.projectValue} style={{ width: "100%" }} onChange={this.projectChange.bind(this)}>
                       {this.state.projectData.map(el => {
-                        return <Option value={el.custProjectId}>{el.projectName}</Option>
+                        return <Option value={el.custProjectId} key={el.custProjectId}>{el.projectName}</Option>
                       })}
                     </Select>
                   </FormItem>
@@ -1127,7 +1134,7 @@ class Clubber extends Component {
                     label="产品服务">                  
                       <Select value={this.state.custPscId} style={{ width: "100%" }} onChange={this.serviceChange.bind(this)}>
                         {this.state.serviceList.map(el => {
-                          return <Option value={el.custPscId}>{el.label}</Option>
+                          return <Option value={el.custPscId} key={el.custPscId}>{el.label}</Option>
                         })}
                       </Select>
                   </FormItem>

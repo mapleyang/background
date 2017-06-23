@@ -383,7 +383,7 @@ const UserDetail = {
       width: 150,
       render: (text, record, index) => {
         return <div className="org-change-operate">
-          <Checkbox checked={record.groupHcuFlg} onChange={_this.groupHcuFlgChange.bind(_this, record, index)}>团检日</Checkbox>
+          <Checkbox checked={record.groupHcuFlg === "1"} onChange={_this.groupHcuFlgChange.bind(_this, record, index)}>团检日</Checkbox>
         </div>
       }
     }, {

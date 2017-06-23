@@ -8,14 +8,14 @@ class LeftMenu extends Component {
   constructor(props, context) {
     super(props)
     this.state = {
-      currentKey: ""
+      currentKey: []
     }
   }
 
   componentWillMount () {
     let pathname = location.hash;
     this.setState({
-      currentKey: pathname.substr(2, location.hash.indexOf("?") - 2)
+      currentKey: [pathname.substr(2, location.hash.indexOf("?") - 2)]
     })
     // location.hash = "/" + MenuList[this.props.modle][0].key
   }
@@ -38,8 +38,6 @@ class LeftMenu extends Component {
   getMenuList () {
     let item;
     let array = [];
-    console.log(MenuList[this.props.modle])
-    console.log(this.state.currentKey)
     item = MenuList[this.props.modle].map(el => {
       let ele;
       if(el.children && el.children.length !== 0) {
