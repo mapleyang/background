@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message   } from 'antd'
+import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message   } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
@@ -30,7 +30,7 @@ class ClubberLogin extends Component {
       detailData: {},
       userDetail: {},
       loginAccount: "",
-      accountStatus: "02",
+      accountStatus: "",
       projectData: [],
       projectValue: "",
       idCardType: [],
@@ -53,7 +53,9 @@ class ClubberLogin extends Component {
       custPscId: "",
       orgSelectValue: [],
       projectName: "",
-      psc: ""
+      psc: "",
+      staffType: "staff",
+      staffAccount: "",
     }
     this.columns = ClubberDetail.getUserColumns(this, "clubberLogin")
   }
@@ -73,7 +75,6 @@ class ClubberLogin extends Component {
         let clubberData = {
           custProjectId: value.data[0].custProjectId,
           pageNumber: 1,
-          accountStatus: this.state.accountStatus
         }
         _this.setState({
           projectData: value.data,
@@ -208,8 +209,10 @@ class ClubberLogin extends Component {
 
   /*项目更改*/
   projectChange (value) {
-    let data = this.state.condition;
-    data.custProjectId = value;
+    let clubberData = {
+      custProjectId: value,
+      pageNumber: 1
+    }
     let cusId = this.state.cusId;
     let projectName = this.state.projectName;
     this.state.projectData.forEach(el => {
@@ -222,13 +225,22 @@ class ClubberLogin extends Component {
       projectValue: value,
       projectName: projectName,
       cusId: cusId,
-      condition: data
+      condition: clubberData,
+      orgSelectValue: [],
+      accountStatus: "",
+      loginAccount: "",
+      mobile: "",
+      staffAccount: "",
+      staffNameValue: "",
+      idCardTypeValue: "",
+      idCardValue: "",
+      staffType: "staff"
     })
     let serviceData = {
       custProjectId: value
     }
     this.getServiceInfo(serviceData, cusId);
-    this.getClubberInfo(data);
+    this.getClubberInfo(clubberData);
   }
 
   /*组织机构更改*/
@@ -256,6 +268,19 @@ class ClubberLogin extends Component {
             data[key] = values[key];
           }
         }
+        data.memberId = this.state.detailData.memberId;
+        data.cusId = this.state.detailData.cusId;
+        data.memberName = this.state.detailData.name;
+        data.sex = this.state.detailData.sex;
+        data.marital = this.state.detailData.marital;
+        data.cardType = this.state.detailData.certiType;
+        data.cardId = this.state.detailData.certiId;
+        data.mobile = this.state.detailData.mobile;
+        data.email = this.state.detailData.email;
+        let date = new Date(this.state.detailData.birth);
+        data.birthYear = date.getFullYear();
+        data.birthMonth = date.getMonth() + 1;
+        data.birthDay = date.getDate();
         let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberLogin/saveEdit";
         Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
           if(value.success === "true") {
@@ -446,7 +471,6 @@ class ClubberLogin extends Component {
     let data = {
       custProjectId: this.state.projectData[0].custProjectId,
       pageNumber: 1,
-      accountStatus: "02"
     }
     this.setState({
       accountStatus: "",
@@ -457,6 +481,8 @@ class ClubberLogin extends Component {
       idCardValue: "",
       custPscId: "",
       psc: "",
+      staffAccount: "",
+      staffType: "staff",
       orgSelectValue: [],
       projectValue: this.state.projectData[0].custProjectId,
       condition: data
@@ -537,7 +563,7 @@ class ClubberLogin extends Component {
   }
   idCardChange = (e) => {
     let data = this.state.condition;
-    data.cardID = e.target.value.trim();
+    data.certiId = e.target.value.trim();
     this.setState({
       condition: data,
       idCardValue: e.target.value
@@ -630,6 +656,21 @@ class ClubberLogin extends Component {
     }
   }
 
+  //员工会员号
+  staffCountChange (e) {
+    let data = this.state.condition;
+    data.staffNo = e.target.value.trim();
+    this.setState({
+      staffAccount: e.target.value,
+      condition: data
+    })
+  }
+  staffTypeChange (value) {
+    this.setState({
+      staffType: value
+    })
+  }
+
   render() {
     let uploadUrl = "/chealth/background/cusServiceOperation/memberInfo/inputMemberData";
     return (
@@ -706,6 +747,7 @@ class ClubberLogin extends Component {
                   {...formItemLayout}
                   label="帐号状态：">                  
                     <Select value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
+                      <Option value="">全部</Option>
                       <Option value="01">未激活</Option>
                       <Option value="02">激活</Option>
                       <Option value="03">失效</Option>
@@ -722,6 +764,19 @@ class ClubberLogin extends Component {
                 </FormItem>
               </Col>
               <Col span={8}>
+                <FormItem
+                  labelCol = {{ span: 6 }}
+                  wrapperCol = {{ span: 14 }}
+                  label="员工/会员号"
+                  className="item-idCard">   
+                  <InputGroup compact>
+                    <Select value={this.state.staffType} onChange={this.staffTypeChange.bind(this)}>
+                      <Option value="staff">员工号</Option>
+                      <Option value="member">会员号</Option>
+                    </Select>
+                    <Input placeholder="请输入相关账号" style={{ width: '68%' }} onChange={this.staffCountChange.bind(this)} value={this.state.staffAccount}/>
+                  </InputGroup> 
+                </FormItem>
               </Col>
             </Row>
           </div>

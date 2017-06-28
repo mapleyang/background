@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
+import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import DataUtil from "../../utils/dataUtil"
@@ -334,6 +334,7 @@ class OrgResChange extends Component {
       productValue: "",
       custPscId: "",
       psc: "",
+      reserveRangeDate: [],
       serviceValue: "",
       custProjectId: this.state.projectData[0].custProjectId
     })

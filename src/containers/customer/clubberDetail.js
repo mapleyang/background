@@ -75,8 +75,8 @@ const UserDetail = {
       },
     },{
       title: '员工/会员号',
-      key: 'memberNo',
-      dataIndex: "memberNo"
+      key: 'staffNo',
+      dataIndex: "staffNo"
     }, {
       title: '手机号',
       key: 'mobile',
@@ -104,7 +104,7 @@ const UserDetail = {
         }]
         let name = "";
         status.forEach(el => {
-          if(el.value === _this.state.accountStatus) {
+          if(el.value === record.accountstatus) {
             name = el.label
           }
         })
@@ -117,10 +117,14 @@ const UserDetail = {
         key: 'operate',
         dataIndex: 'operate',
         render: (text, record, index) => {
+          let deleteItem = "";
+          if(record.accountstatus !== "05") {
+            deleteItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "delete", record, index)}><a>删除</a></span>
+          }
           return <span className="table-operate">
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "edit", record, index)}><a>编辑</a></span>
-            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "delete", record, index)}><a>删除</a></span>
+            {deleteItem}
           </span>
         },
       }
@@ -235,77 +239,104 @@ const UserDetail = {
     }]
   },
   getReserveItem: (_this) => {
-    return [{
-      title: '项目名称',
-      dataIndex: 'projectName',
-      key: 'projectName',
-    }, {
-      title: '订单号',
-      dataIndex: 'recordId',
-      key: 'recordId',
-    }, {
-      title: '产品服务',
-      dataIndex: 'pscName',
-      key: 'pscName',
-    }, {
-      title: '证件号',
-      key: 'certiId',
-      dataIndex: "certiId",
-    },{
-      title: '员工/会员号',
-      key: 'memberNo',
-      dataIndex: "memberNo"
-    }, {
-      title: '套餐详情',
-      key: 'packageDetail',
-      dataIndex: "packageDetail",
-      render: (text, record, index) => {
-        let value = "";
-        if(record.recordId) {
-          value = <span onClick={_this.packageDescClick.bind(_this, text, record, index)}><a>查看</a></span>
+    let list = [];
+    if(_this.state.hcuReserveFlg === "1") {
+      list = [{
+        title: '订单号',
+        dataIndex: 'recordId',
+        key: 'recordId',
+      }, {
+        title: '用户名称',
+        dataIndex: 'staffNameChs',
+        key: 'staffNameChs',
+      },{
+        title: '员工/会员号',
+        key: 'staffNo',
+        dataIndex: "staffNo"
+      },{
+        title: '套餐详情',
+        key: 'packageDetail',
+        dataIndex: "packageDetail",
+        render: (text, record, index) => {
+          let value = "";
+          if(record.recordId) {
+            value = <span onClick={_this.packageDescClick.bind(_this, text, record, index)}><a>详情</a></span>
+          }
+          return value
+        },
+      },{
+        title: '服务状态',
+        key: 'serviceStatus',
+        dataIndex: "serviceStatus"
+      },{
+        title: '支付状态',
+        key: 'tranStatus',
+        dataIndex: "tranStatus"
+      },{
+        title: '订单时间',
+        key: 'orderDate',
+        dataIndex: "orderDate"
+      },{
+        title: '预约服务日期',
+        key: 'appointServiceDate',
+        dataIndex: "appointServiceDate"
+      },{
+        title: '预约状态',
+        key: 'reserveStatus',
+        dataIndex: "reserveStatus",
+        render: (text, record, index) => {
+          return <span>已预约</span>
         }
-        return value
-      },
-    },{
-      title: '服务状态',
-      key: 'serviceStatus',
-      dataIndex: "serviceStatus"
-    },{
-      title: '支付状态',
-      key: 'tranStatus',
-      dataIndex: "tranStatus"
-    },{
-      title: '订单时间',
-      key: 'orderDate',
-      dataIndex: "orderDate"
-    },{
-      title: '预约服务日期',
-      key: 'appointServiceDate',
-      dataIndex: "appointServiceDate"
-    },{
-      title: '预约状态',
-      key: 'reserveStatus',
-      dataIndex: "reserveStatus",
-      render: (text, record, index) => {
-        let name = "已预约";
-        if(!record.recordId) {
-          name = "未预约"
+      },{
+        title: '操作',
+        key: 'operate',
+        dataIndex: 'operate',
+        render: (text, record, index) => {
+          return <span className="table-operate">
+            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
+            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
+            { record.serviceStatus === "已取消" ? "" : <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "cancel", record, index)}><a>取消</a></span>}
+          </span>
+        },
+      }]
+    }
+    else {
+      list = [{
+        title: '用户名称',
+        dataIndex: 'nameChs',
+        key: 'nameChs',
+      },{
+        title: '手机号',
+        dataIndex: 'mobile',
+        key: 'mobile',
+      }, {
+        title: '证件号',
+        key: 'certiId',
+        dataIndex: "certiId",
+      },{
+        title: '员工/会员号',
+        key: 'staffNo',
+        dataIndex: "staffNo"
+      },{
+        title: '预约状态',
+        key: 'reserveStatus',
+        dataIndex: "reserveStatus",
+        render: (text, record, index) => {
+          return <span>未预约</span>
         }
-        return <span>{name}</span>
-      }
-    },{
-      title: '操作',
-      key: 'operate',
-      dataIndex: 'operate',
-      render: (text, record, index) => {
-        return <span className="table-operate">
-          <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
-          {record.recordId ? "" : <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index)}><a>预约</a></span>}
-          {record.recordId ? <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span> : ""}
-          {record.recordId ? <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "cancel", record, index)}><a>取消</a></span> : ""}
-        </span>
-      },
-    }]
+      },{
+        title: '操作',
+        key: 'operate',
+        dataIndex: 'operate',
+        render: (text, record, index) => {
+          return <span className="table-operate">
+            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
+            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index)}><a>预约</a></span>
+          </span>
+        },
+      }]
+    }
+    return list
   },
   getOrgImportItem: (_this) => {
     return [{
@@ -317,17 +348,13 @@ const UserDetail = {
       dataIndex: 'pscName',
       key: 'pscName',
     }, {
-      title: '服务集团',
-      dataIndex: 'group',
-      key: 'group',
-    }, {
       title: '服务机构',
       dataIndex: 'institutionsName',
       key: 'institutionsName',
-    }, {
-      title: '服务城市',
-      dataIndex: 'cityId',
-      key: 'cityId',
+    },{
+      title: '服务机构CD',
+      dataIndex: 'hcuInstitutionsCd',
+      key: 'hcuInstitutionsCd',
     },{
       title: '操作',
       key: 'operate',

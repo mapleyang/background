@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker  } from 'antd'
+import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker  } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import DataUtil from "../../utils/dataUtil"
@@ -279,12 +279,17 @@ class OrgResImport extends Component {
 
   /*模态框*/
   handleOk = (e) => {
-    console.log(e);
     this.setState({
       detaiVisible: false,
       editVisible: false,
+    });
+  }
+
+  importHandleOk = (e) => {
+    this.setState({
       importVisible: false,
     });
+    this.getGroupOrgInfo(this.state.condition)
   }
 
   handleCancel = (e) => {
@@ -600,7 +605,6 @@ class OrgResImport extends Component {
               <Button type="primary" onClick={this.searchClick.bind(this)}>搜索</Button>
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
               <Button type="primary" onClick={this.importClick.bind(this)}>排期名额导入</Button>
-              <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
             </span>
           </div>
           <div className="line-area"></div>
@@ -628,7 +632,7 @@ class OrgResImport extends Component {
         <Modal
           title={this.state.projectName + "的服务机构排期和名额导入"}
           visible={this.state.importVisible}
-          onOk={this.handleOk}
+          onOk={this.importHandleOk}
           onCancel={this.handleCancel}
           width={600}>
           <ClubberImport 
@@ -648,3 +652,4 @@ class OrgResImport extends Component {
 
 export default OrgResImport = Form.create({
 })(OrgResImport);
+              // <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>

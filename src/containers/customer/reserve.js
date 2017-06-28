@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
+import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
@@ -69,8 +69,12 @@ class Reserve extends Component {
       addPayHcuItemDtoList: "",
       addFreeHcuPackageDtoList: "",
       addPayHcuPackageDtoList: "",
+      reserveDateList: [],
+      orderRangeDate: [],
+      reserveRangDate: [],
+      staffNo: "",
+      staffType: "staff"
     }
-    this.columns = ClubberDetail.getReserveItem(this)
   }
 
   componentWillMount () {
@@ -230,16 +234,23 @@ class Reserve extends Component {
       }
       this.getProvinceList(data);
       setTimeout(function () {
+        let staffBirthday = "";
+        if(record.birthYear) {
+          let month = parseInt(record.birthMonth) < 10 ? "0" + record.birthMonth : record.birthMonth;
+          let day = parseInt(record.birthDay) < 10 ? "0" + record.birthDay : record.birthDay;
+          staffBirthday = record.birthYear + "-" + month + "-" + day;
+        }
         let initInfo = {
-          staffMemberName: "",
+          staffMemberName: record.nameChs,
           staffMemberNo: "",
-          staffSex: "1",
-          staffMarital: "2",
+          staffSex: record.sex,
+          staffMarital: record.marital,
           hcuPackageId: "",
-          staffCertiId: "",
-          staffMobile: "",
-          staffEmail: "",
-          staffBirthday: "",
+          staffCertiId: record.certiId,
+          staffCertiType: record.certiType,
+          staffMobile: record.mobile,
+          staffEmail: record.email,
+          staffBirthday: moment(staffBirthday, 'YYYY-MM-DD'),
           appointServiceTime: "",
           areaValue: [],
           hcuInstitutionId: "",
@@ -281,6 +292,8 @@ class Reserve extends Component {
           return Operate.getResponse(url, data, "POST", "html").then(function(value){
             if(value.success === "true") {
               message.success(record.grouprecordId + "订单删除成功");
+              let orderData = _this.state.condition;
+              _this.getOrderInfo(orderData);
             }
             else {
               message.error(record.grouprecordId + "订单删除失败，请重试！");
@@ -571,6 +584,12 @@ class Reserve extends Component {
     if(this.state.cardID !== "") {
       orderData.cardID = this.state.cardID;
     }
+    if(this.state.staffNo !== "") {
+      orderData.staffNo = this.state.staffNo;
+    }
+    this.setState({
+      condition: orderData
+    })
     this.getOrderInfo(orderData);
   }
   /*清空*/
@@ -584,9 +603,13 @@ class Reserve extends Component {
       hcuReserveFlg: "",
       custPscId: "",
       psc: "",
+      staffNo: "",
       cardID: "",
       serviceValue: "",
       hcuReserveFlg: "1",
+      orderRangeDate: [],
+      reserveRangDate: [],
+      staffType: "staff",
       custProjectId: this.state.projectData[0].custProjectId,
       pageNumber: 1
     })
@@ -634,55 +657,52 @@ class Reserve extends Component {
   }
 
   /*订单日期修改*/
-  orderChange = (e) => {
-    let dayFrom = new Date(e[0]._d);
-    let dayTo = new Date(e[1]._d);
-    let orderData = {
-      cusId: 1,             
-      pageNumber: 0,
-      orderDayFrom: dayFrom.getFullYear() + "-" + (dayFrom.getMonth() + 1) + "-" + dayFrom.getDate(),
-      orderDayTo: dayTo.getFullYear() + "-" + (dayTo.getMonth() + 1) + "-" + dayTo.getDate()
-    }
+  orderChange = (value, dateString) => {
+    let  orderData = this.state.condition;
+    orderData.orderDayFrom = moment(dateString[0]).format("YYYYMMDD");
+    orderData.orderDayTo = moment(dateString[1]).format("YYYYMMDD");
+    this.setState({
+      condition: orderData,
+      orderRangeDate: value
+    })
     this.getOrderInfo(orderData);
   }
 
   /*预约日期修改*/
-  reserveDateChange = (e) => {
-    let dayFrom = new Date(e[0]._d);
-    let dayTo = new Date(e[1]._d);
-    let orderData = {
-      cusId: 1,             
-      pageNumber: 0,
-      appointServiceDayFrom: dayFrom.getFullYear() + "-" + (dayFrom.getMonth() + 1) + "-" + dayFrom.getDate(),
-      appointServiceDayTo: dayTo.getFullYear() + "-" + (dayTo.getMonth() + 1) + "-" + dayTo.getDate()
-    }
+  reserveDateChange = (value, dateString) => {
+    let  orderData = this.state.condition;
+    orderData.appointServiceDayFrom = moment(dateString[0]).format("YYYYMMDD");
+    orderData.appointServiceDayTo = moment(dateString[1]).format("YYYYMMDD");
+    this.setState({
+      condition: orderData,
+      reserveRangDate: value
+    })
     this.getOrderInfo(orderData);
   }
 
   /*身份证类型*/
   idCardTypeChange (value) {
-    let orderData = {
-      cusId: 1,             
-      pageNumber: 0,
-      cardType: value === "all" ? "" : value
-    }
+    let orderData = this.state.condition;
+    orderData.cardType = value === "all" ? "" : value;
     this.setState({
       cardType: value,
+      condition: orderData,
     })
     this.getOrderInfo(orderData)
   }
 
   reserveTableChange = (pagination, filters, sorter) => {
-    console.log(pagination)
-    this.setState({
-      pageNumber: pagination.current
-    })
     let orderData = this.state.condition;
     orderData.pageNumber = pagination.current,
+    this.setState({
+      pageNumber: pagination.current,
+      condition: orderData
+    })
     this.getOrderInfo(orderData)
   }
 
   reserveFormFuc (data) {
+    const _this = this;
     this.setState({
       reserveVisible: false,
     })
@@ -1313,7 +1333,9 @@ class Reserve extends Component {
   }
 
   memberNoChange = (e) => {
-    let orderData = this.state.condition;
+    this.setState({
+      staffNo: e.target.value.trim()
+    })
   }
 
   idCardChange = (e) => {
@@ -1341,6 +1363,11 @@ class Reserve extends Component {
     return item;
   }
 
+  staffTypeChange (value) {
+    this.setState({
+      staffType: value
+    })
+  }
 
   render() {
     return (
@@ -1378,8 +1405,15 @@ class Reserve extends Component {
                   <FormItem
                     labelCol = {{ span: 6 }}
                     wrapperCol = {{ span: 14 }}
-                    label="员工/会员号：">
-                    <Input onChange={this.memberNoChange} placeholder="请输入员工或会员号" />
+                    label="员工/会员号"
+                    className="item-idCard">
+                    <InputGroup compact>
+                      <Select value={this.state.staffType} onChange={this.staffTypeChange.bind(this)}>
+                        <Option value="staff">员工号</Option>
+                        <Option value="member">会员号</Option>
+                      </Select>
+                      <Input onChange={this.memberNoChange} placeholder="请输入员工或会员号" value={this.state.staffNo}/>
+                    </InputGroup> 
                   </FormItem>
                 </Col>
               </Row>
@@ -1426,14 +1460,14 @@ class Reserve extends Component {
                 <FormItem
                   {...formItemLayoutFirstCell}
                   label="订单日期">                  
-                    <RangePicker onChange={this.orderChange}/>
+                    <RangePicker onChange={this.orderChange} value={this.state.orderRangeDate}/>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   {...formItemLayout}
                   label="预约服务日期">                  
-                    <RangePicker onChange={this.reserveDateChange}/>
+                    <RangePicker onChange={this.reserveDateChange} value={this.state.reserveRangDate}/>
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -1473,7 +1507,7 @@ class Reserve extends Component {
             <div className="group-table-operate">
             </div>
             <Table 
-              columns={this.columns} 
+              columns={ClubberDetail.getReserveItem(this)} 
               dataSource={this.state.data} 
               loading={this.state.tableLoading}
               onChange={this.reserveTableChange} size="middle" 
@@ -1489,7 +1523,7 @@ class Reserve extends Component {
           {this.getOrderDetail()}
         </Modal>
         <Modal
-          title={"用户" + this.state.operateType === "reserve" ? "预约操作" : "改约操作"}
+          title={this.state.operateType === "reserve" ? "用户预约操作" : "用户改约操作"}
           visible={this.state.reserveVisible}
           onOk={this.reservehandleOk}
           onCancel={this.reserveHandleCancel}

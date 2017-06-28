@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, Upload, message } from 'antd'
+import { Icon, Select, Form, Button, Row, Col, Upload, message } from 'antd'
 import './index.scss';
 import Operate from "./operate"
 
@@ -172,7 +172,7 @@ class ClubberImport extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     let data = {
-      custProjectId: this.state.projectValue,
+      custProjectId: this.state.projectValue.toString(),
       custPscId: this.state.custPscId
     };
     if(this.state.type === "org") {
@@ -188,10 +188,14 @@ class ClubberImport extends Component {
       },
       onChange(info) {
         if (info.file.status !== 'uploading') {
-          console.log(info.file, info.fileList);
         }
         if (info.file.status === 'done') {
-          message.success(`${info.file.name} 上传成功.`);
+          if(info.file.response.success === "true") {
+            message.success(`${info.file.name} 上传成功.`);
+          }
+          else {
+            message.error(`${info.file.name} 上传失败.`);
+          }
         } else if (info.file.status === 'error') {
           message.error(`${info.file.name} 上传失败.`);
         }

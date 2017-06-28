@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Icon, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
+import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import DataUtil from "../../utils/dataUtil"
@@ -36,7 +36,8 @@ class Clubber extends Component {
       editData: {},
       addEditTitle: "",
       loginAccount: "",
-      accountStatus: "02",
+      staffAccount: "",
+      accountStatus: "",
       projectData: [],
       projectValue: "",
       idCardType: [],
@@ -60,7 +61,8 @@ class Clubber extends Component {
       custPscId: "",
       orgSelectValue: [],
       projectName: "",
-      psc: ""
+      psc: "",
+      staffType: "staff"
     }
     this.columns = ClubberDetail.getUserColumns(this, "clubber")
   }
@@ -79,7 +81,6 @@ class Clubber extends Component {
       if(value.success === "true") {
         let condition = {
           custProjectId: value.data[0].custProjectId,
-          accountStatus: "02",
           pageNumber: 1,
         }
         _this.setState({
@@ -198,9 +199,10 @@ class Clubber extends Component {
       const dateFormat = 'YYYY-MM-DD';
       this.setState({
         addEditVisible: true,
-        editData: record,
+        detailData: record,
         addEditTitle: record.name + "信息编辑"
       })
+      this.dialogUserInfo();
       let data = {
         memberName: record.name,
         sex: record.sex,
@@ -212,9 +214,10 @@ class Clubber extends Component {
         workCity: record.workCity,
         workPosition: record.workPosition,
         cusDepartmentId: record.department,
-        birth: moment(record.birth, dateFormat),
-        memberNo: record.memberNo,
-        accountStatus: this.state.accountStatus
+        cusInstitutionId: record.institutionsId,
+        birth: record.birth === null ? "" : moment(record.birth, dateFormat),
+        staffNo: record.staffNo,
+        accountStatus: record.accountstatus
       }
       this.props.form.setFieldsValue(data)
     }
@@ -242,8 +245,10 @@ class Clubber extends Component {
 
   /*项目更改*/
   projectChange (value) {
-    let data = this.state.condition;
-    data.custProjectId = value;
+    let clubberData = {
+      custProjectId: value,
+      pageNumber: 1
+    };
     let cusId = this.state.cusId;
     let projectName = this.state.projectName;
     this.state.projectData.forEach(el => {
@@ -256,13 +261,22 @@ class Clubber extends Component {
       projectValue: value,
       projectName: projectName,
       cusId: cusId,
-      condition: data
+      condition: clubberData,
+      orgSelectValue: [],
+      accountStatus: "",
+      loginAccount: "",
+      mobile: "",
+      staffAccount: "",
+      staffNameValue: "",
+      idCardTypeValue: "",
+      idCardValue: "",
+      staffType: "staff"
     })
     let serviceData = {
       custProjectId: value
     }
     this.getServiceInfo(serviceData, cusId);
-    this.getClubberInfo(data);
+    this.getClubberInfo(clubberData);
   }
 
   /*组织机构更改*/
@@ -302,6 +316,7 @@ class Clubber extends Component {
           let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberInfo/saveEdit";
           Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
             if(value.success === "true") {
+              _this.getClubberInfo(_this.state.condition)
               _this.setState({
                 addEditVisible: false
               })
@@ -317,6 +332,7 @@ class Clubber extends Component {
           let clubberAddUrl = "/chealth/background/cusServiceOperation/memberInfo/saveCreate";
           Operate.getResponse(clubberAddUrl, data, "POST", "html").then((value) => {
             if(value.success === "true") {
+              _this.getClubberInfo(_this.state.condition)
               _this.setState({
                 addEditVisible: false
               })
@@ -398,6 +414,7 @@ class Clubber extends Component {
         clubberDeleteVisible: false,
       })  
       if(value.success === "true") {
+        _this.getClubberInfo(_this.state.condition)
         message.success("删除" + this.state.detailData.name + "成功！")
       }
       else {
@@ -418,9 +435,15 @@ class Clubber extends Component {
     this.setState({
       detaiVisible: false,
       addEditVisible: false,
-      importVisible: false,
       clubberDeleteVisible: false,
     });
+  }
+
+  clubberHandleOk = (e) => {
+    this.setState({
+      importVisible: false,
+    });
+    this.getClubberInfo(this.state.condition)
   }
 
   handleCancel = (e) => {
@@ -617,7 +640,7 @@ class Clubber extends Component {
                 {...modalItemLayout}
                 label="员工/会员号"
                 hasFeedback>    
-                {getFieldDecorator('memberNo', {
+                {getFieldDecorator('staffNo', {
                     rules: [{ required: true, message: '请输入员工号或会员号' }],
                   })(
                   <Input placeholder="员工号或会员号" />
@@ -634,7 +657,6 @@ class Clubber extends Component {
                     <Select placeholder="请选择账号状态">
                       <Option value="01">未激活</Option> 
                       <Option value="02">激活</Option>
-                      <Option value="03">失效</Option>
                       <Option value="04">禁用</Option>
                       <Option value="05">作废</Option>
                     </Select>
@@ -810,18 +832,19 @@ class Clubber extends Component {
     let data = {
       custProjectId: this.state.projectData[0].custProjectId,
       pageNumber: 1,
-      accountStatus: "02"
     }
     this.setState({
-      accountStatus: "02",
+      accountStatus: "",
       loginAccount: "",
       mobile: "",
+      staffAccount: "",
       staffNameValue: "",
       idCardTypeValue: "",
       idCardValue: "",
       orgSelectValue: [],
       custPscId: "",
       psc: "",
+      staffType: "staff",
       projectValue: this.state.projectData[0].custProjectId,
       condition: data
     });
@@ -833,16 +856,36 @@ class Clubber extends Component {
   }
   /*新增*/
   addUserClick () {
-    const _this = this;
     this.setState({
       addEditVisible: true,
       addEditTitle: "新增用户信息"
     })
-    /*获取省（直辖市数据）*/
+    this.dialogUserInfo();
+    let initData = {
+      sex: "1",
+      marital: "1",
+      cardType: "1",
+      birth: "",
+      accountStatus: "01",
+      memberName: "",
+      mobile: "",
+      email: "",
+      certiId: "",
+      staffNo: "",
+      workCity: "",
+      workPosition: "",
+      cusDepartmentId: "",
+      cusInstitutionId: "",
+    }
+    this.props.form.setFieldsValue(initData);
+  }
+  dialogUserInfo () {
+    const _this = this;
     let data = {
       cusId: this.state.cusId,                  
       custPscId: this.state.custPscId                
     }
+    /*获取省（直辖市数据）*/
     let provinceUrl = "/chealth/background/ajaxBusiness/loadCustParplmList";
     Operate.getResponse(provinceUrl, data, "POST", "html").then((value) => {
       if(value.success === "true") {
@@ -918,22 +961,6 @@ class Clubber extends Component {
         })
       }
     }, (value) => {})
-    let initData = {
-      sex: "1",
-      marital: "1",
-      cardType: "1",
-      birth: "",
-      accountStatus: "01",
-      memberName: "",
-      mobile: "",
-      email: "",
-      certiId: "",
-      // workCity: "",
-      // workPosition: "",
-      // cusDepartmentId: "",
-      // cusInstitutionId: "",
-    }
-    this.props.form.setFieldsValue(initData);
   }
   /*导出*/
   exportClick () {
@@ -1015,7 +1042,7 @@ class Clubber extends Component {
   }
   idCardChange = (e) => {
     let data = this.state.condition;
-    data.cardID = e.target.value.trim();
+    data.certiId = e.target.value.trim();
     this.setState({
       condition: data,
       idCardValue: e.target.value
@@ -1108,6 +1135,20 @@ class Clubber extends Component {
       }, (value) => {})
     }
   }
+  //员工会员号
+  staffCountChange (e) {
+    let data = this.state.condition;
+    data.staffNo = e.target.value.trim();
+    this.setState({
+      staffAccount: e.target.value,
+      condition: data
+    })
+  }
+  staffTypeChange (value) {
+    this.setState({
+      staffType: value
+    })
+  }
 
   render() {
     let uploadUrl = "/chealth/background/cusServiceOperation/memberInfo/inputMemberData";
@@ -1185,9 +1226,9 @@ class Clubber extends Component {
                   {...formItemLayout}
                   label="帐号状态：">                  
                     <Select value={this.state.accountStatus} style={{ width: "100%" }} onChange={this.countStatusChange.bind(this)}>
+                      <Option value="">全部</Option>
                       <Option value="02">激活</Option>
                       <Option value="01">未激活</Option>
-                      <Option value="03">失效</Option>
                       <Option value="04">禁用</Option>
                       <Option value="05">作废</Option>
                     </Select>
@@ -1201,6 +1242,19 @@ class Clubber extends Component {
                 </FormItem>
               </Col>
               <Col span={8}>
+                <FormItem
+                  labelCol = {{ span: 6 }}
+                  wrapperCol = {{ span: 14 }}
+                  label="员工/会员号"
+                  className="item-idCard">   
+                  <InputGroup compact>
+                    <Select value={this.state.staffType} onChange={this.staffTypeChange.bind(this)}>
+                      <Option value="staff">员工号</Option>
+                      <Option value="member">会员号</Option>
+                    </Select>
+                    <Input placeholder="请输入相关账号" style={{ width: '68%' }} onChange={this.staffCountChange.bind(this)} value={this.state.staffAccount}/>
+                  </InputGroup> 
+                </FormItem>
               </Col>
             </Row>
           </div>
@@ -1210,7 +1264,6 @@ class Clubber extends Component {
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
               <Button type="primary" onClick={this.addUserClick.bind(this)}>用户新增</Button>
               <Button type="primary" onClick={this.importClick.bind(this)}>用户导入</Button>
-              <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
             </span>
           </div>
           <div className="line-area"></div>
@@ -1246,7 +1299,7 @@ class Clubber extends Component {
         <Modal
           title={this.state.projectName + "的用户信息导入"}
           visible={this.state.importVisible}
-          onOk={this.handleOk}
+          onOk={this.clubberHandleOk}
           onCancel={this.handleCancel}
           width={600}>
           <ClubberImport 
@@ -1276,3 +1329,4 @@ class Clubber extends Component {
 
 export default Clubber = Form.create({
 })(Clubber);
+              // <Button type="primary" onClick={this.exportClick.bind(this)}>模板导出</Button>
