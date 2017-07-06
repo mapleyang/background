@@ -235,7 +235,7 @@ class Reserve extends Component {
       this.getProvinceList(data);
       setTimeout(function () {
         let staffBirthday = "";
-        if(record.birthYear) {
+        if(record.birthYear !== null) {
           let month = parseInt(record.birthMonth) < 10 ? "0" + record.birthMonth : record.birthMonth;
           let day = parseInt(record.birthDay) < 10 ? "0" + record.birthDay : record.birthDay;
           staffBirthday = record.birthYear + "-" + month + "-" + day;
@@ -250,10 +250,11 @@ class Reserve extends Component {
           staffCertiType: record.certiType,
           staffMobile: record.mobile,
           staffEmail: record.email,
-          staffBirthday: moment(staffBirthday, 'YYYY-MM-DD'),
+          staffBirthday: staffBirthday !== "" ? moment(staffBirthday, 'YYYY-MM-DD') : "",
           appointServiceTime: "",
           areaValue: [],
           hcuInstitutionId: "",
+          sendRmdKbn: "0"
         }
         _this.props.form.setFieldsValue(initInfo)
       }, 100)
@@ -272,6 +273,7 @@ class Reserve extends Component {
         areaValue: [],
         hcuInstitutionId: "",
         appointServiceTime:  moment(record.appointServiceDate, 'YYYY-MM-DD'),
+        sendRmdKbn: "0"
       }
       this.props.form.setFieldsValue(initInfo);
     }
@@ -364,7 +366,7 @@ class Reserve extends Component {
           cusId: _this.state.cusId,
           custPscId: _this.state.custPscId,
           memberId: this.state.detailData.memberId,                                                     //会员Id
-          psc: this.state.detailData.psc,
+          psc: this.state.psc,
         }
         let initInfo = {}
         if(_this.state.hcuReserveFlg === "1") {   //已经预约
@@ -1306,6 +1308,19 @@ class Reserve extends Component {
               </FormItem>
             </Col>
             <Col span={12}>
+              <FormItem
+                {...modalItemLayout}
+                label="是否通知信息"
+                hasFeedback>  
+                  {getFieldDecorator('sendRmdKbn', {
+                    rules: [{ required: true }],
+                  })(     
+                    <RadioGroup>
+                      <Radio value="0">否</Radio>
+                      <Radio value="1">是</Radio>
+                    </RadioGroup>
+                  )}             
+              </FormItem>
             </Col>
           </Row>
         </div>
@@ -1499,7 +1514,6 @@ class Reserve extends Component {
             <span className="group-search-button">
               <Button type="primary" onClick={this.searchClick.bind(this)}>搜索</Button>
               <Button type="primary" onClick={this.clearClick.bind(this)}>条件清空</Button>
-              <Button type="primary" onClick={this.exportClick.bind(this)}>预约导出</Button>
             </span>
           </div>
           <div className="line-area"></div>
@@ -1554,3 +1568,4 @@ class Reserve extends Component {
 
 export default Reserve = Form.create({
 })(Reserve);
+              // <Button type="primary" onClick={this.exportClick.bind(this)}>预约导出</Button>

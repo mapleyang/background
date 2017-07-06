@@ -204,7 +204,7 @@ class OrgResImport extends Component {
       custPscId : record.custPscId,                 // 客户所购服务周期ID
       hospitalId : record.hcuInstitutionsId,         // 体检机构ID
       pageNumber: 1,
-      pageSize: 8
+      pageSize: 10,
     }
     this.getGroupOrgDetailReq(record, groupOrgdetailData)
   }

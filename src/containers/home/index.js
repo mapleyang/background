@@ -38,10 +38,18 @@ class Home extends Component {
     location.hash = "/login"
   }
 
+  getLogoList () {
+    let item = "";
+    return item;
+  }
+
   render() {
     const defaultZH_EN = window.ZH_EN[language.getLanguage()];
     return (
       <div className="home">
+        <div className="header-logo">
+          {this.getLogoList()}
+        </div>
         <div className="home-modles">
           <Row>{this.getModle()}</Row>
         </div>

@@ -40,10 +40,6 @@ const UserDetail = {
   },
   getUserColumns: (_this, flag) => {
     let columns = [{
-      title: '用户姓名',
-      dataIndex: 'name',
-      key: 'name',
-    }, {
       title: '项目名称',
       dataIndex: 'code',
       key: 'code',
@@ -56,6 +52,10 @@ const UserDetail = {
         })
         return <span>{projectName}</span>
       }
+    }, {
+      title: '用户姓名',
+      dataIndex: 'name',
+      key: 'name',
     }, {
       title: '机构组织',
       dataIndex: 'institutionName',
@@ -281,6 +281,10 @@ const UserDetail = {
         key: 'appointServiceDate',
         dataIndex: "appointServiceDate"
       },{
+        title: '服务机构',
+        key: 'test',
+        dataIndex: "test"
+      },{
         title: '预约状态',
         key: 'reserveStatus',
         dataIndex: "reserveStatus",
@@ -292,9 +296,13 @@ const UserDetail = {
         key: 'operate',
         dataIndex: 'operate',
         render: (text, record, index) => {
+          let changeItem = "";
+          if(record.serviceStatus === "待安排") {
+            changeItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
+          }
           return <span className="table-operate">
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
-            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
+            {changeItem}
             { record.serviceStatus === "已取消" ? "" : <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "cancel", record, index)}><a>取消</a></span>}
           </span>
         },
