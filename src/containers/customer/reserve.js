@@ -193,6 +193,10 @@ class Reserve extends Component {
       operateType: flag,
       reserveFlag: reserveFlag
     })
+    let provinceListData = {
+      cusId: this.state.cusId,
+      custPscId: this.state.custPscId,
+    }
     if(flag === "detail") {
       this.setState({
         detailVisible: true,
@@ -215,10 +219,7 @@ class Reserve extends Component {
           psc: this.state.psc      
         }
         this.getPackageList(packageData);
-        let data = {
-          cusId: this.state.cusId,
-          custPscId: this.state.custPscId 
-        }
+        this.getProvinceList(provinceListData);
         setTimeout(function () {
           let staffBirthday = "";
           if(record.birthYear !== null) {
@@ -231,15 +232,12 @@ class Reserve extends Component {
             staffNo: record.staffNo,
             staffSex: record.sex,
             staffMarital: record.marital,
-            hcuPackageId: "",
             staffCertiId: record.certiId,
             staffCertiType: record.certiType,
             staffMobile: record.mobile,
             staffEmail: record.email,
             staffBirthday: staffBirthday !== "" ? moment(staffBirthday, 'YYYY-MM-DD') : "",
             appointServiceTime: "",
-            areaValue: [],
-            hcuInstitutionId: "",
             sendRmdKbn: "0"
           }
           _this.props.form.setFieldsValue(initInfo)
@@ -261,39 +259,33 @@ class Reserve extends Component {
           psc: this.state.psc      
         }
         this.getPackageList(packageData);
-        let data = {
-          cusId: this.state.cusId,
-          custPscId: this.state.custPscId 
+        this.getProvinceList(provinceListData);
+        if(record.hcuPackageId) {
+          provinceListData.hcuPackageId = record.hcuPackageId;
+          this.getPackageInfo(provinceListData);
+        }
+        let staffBirthday = "";
+        if(record.birthYear !== null) {
+          let month = parseInt(record.staffBirthMonth) < 10 ? "0" + record.staffBirthMonth : record.staffBirthMonth;
+          let day = parseInt(record.staffBirthDay) < 10 ? "0" + record.staffBirthDay : record.staffBirthDay;
+          staffBirthday = record.staffBirthYear + "-" + month + "-" + day;
         }
         setTimeout(function () {
-          let staffBirthday = "";
-          if(record.birthYear !== null) {
-            let month = parseInt(record.staffBirthMonth) < 10 ? "0" + record.staffBirthMonth : record.staffBirthMonth;
-            let day = parseInt(record.staffBirthDay) < 10 ? "0" + record.staffBirthDay : record.staffBirthDay;
-            staffBirthday = record.staffBirthYear + "-" + month + "-" + day;
-          }
-          let areaValue = [];
-          if(record.parplmId && record.cityId) {
-            areaValue = [record.parplmId, record.cityId]
-          }
           let initInfo = {
             staffMemberName: record.staffNameChs,
             staffNo: record.staffNo,
             staffSex: record.staffSex,
             staffMarital: record.staffMarital,
-            hcuPackageId: record.hcuPackageId ? record.hcuPackageId.toString() : "",
             staffCertiId: record.staffCertiId,
             staffCertiType: record.staffCertiType,
             staffMobile: record.staffMobile,
             staffEmail: record.staffEmail,
             staffBirthday: staffBirthday !== "" ? moment(staffBirthday, 'YYYY-MM-DD') : "",
             appointServiceTime: record.appointServiceDate !== null ? moment(record.appointServiceDate, 'YYYY-MM-DD') : "",
-            areaValue: areaValue,
-            hcuInstitutionId: record.hcuInstitutionsId ? record.hcuInstitutionsId : "",
             sendRmdKbn: record.sendMailKbn
           }
           _this.props.form.setFieldsValue(initInfo)
-        }, 500)
+        }, 100);
       }
     }
     else if(flag === "change") {
@@ -302,18 +294,8 @@ class Reserve extends Component {
         detailData: record,
         hcuPackageId: record.hcuPackageId,
       })
-      let data = {
-        cusId: record.cusId,
-        custPscId: record.custPscId 
-      }
-      this.getProvinceList(data);
-      let areaValue = [];
-      if(record.parplmId && record.cityId) {
-        areaValue = [record.parplmId, record.cityId]
-      }
+      this.getProvinceList(provinceListData);
       let initInfo = {
-        areaValue: areaValue,
-        hcuInstitutionId: record.hcuInstitutionsId ? record.hcuInstitutionsId : "",
         appointServiceTime: moment(record.appointServiceDate, 'YYYY-MM-DD'),
         sendRmdKbn: "0"
       }
@@ -370,7 +352,7 @@ class Reserve extends Component {
         })
         if(this.state.operateType === "change" || this.state.reserveFlag === "continue") {
           if(this.state.detailData.parplmId) {
-            provinceData.parplmId = this.state.detailData.parplmId;
+            provinceData.parplmId = _this.state.detailData.parplmId;
             _this.getCityList(provinceData)
           }
         }
@@ -1123,21 +1105,31 @@ class Reserve extends Component {
           }
         })
         if(list.length !== 0) {
-          let initInfo = {
-            hcuPackageId: list[0].value,
+          let packageInfoData = {
+            cusId: _this.state.cusId,             
+            custPscId: _this.state.custPscId,           
+          }
+          let initInfo = {}
+          if(_this.state.operateType === "reserve" && _this.state.reserveFlag === "init") {
+            initInfo.hcuPackageId = list[0].value;
+            _this.setState({
+              hcuPackageId: list[0].value
+            });
+            packageInfoData.hcuPackageId = list[0].value;
+            _this.getPackageInfo(packageInfoData);
+          }
+          else {
+            if(_this.state.detailData.hcuPackageId) {
+              initInfo.hcuPackageId = _this.state.detailData.hcuPackageId.toString();
+            }
+            else {
+              initInfo.hcuPackageId = list[0].value;
+            }
           }
           _this.props.form.setFieldsValue(initInfo)
-          let packageInfoData = {
-            cusId: this.state.cusId,             
-            custPscId: this.state.custPscId,           
-            hcuPackageId: list[0].value         
-          }
           _this.setState({
             packageList: list,
-            hcuPackageId: list[0].value
           })
-          _this.getPackageInfo(packageInfoData);
-          _this.getProvinceList(packageData);
         }
       }
     }, (value) => {})

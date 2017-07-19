@@ -62,7 +62,7 @@ class Clubber extends Component {
       orgSelectValue: [],
       projectName: "",
       psc: "",
-      staffType: "staff"
+      staffType: "staff",
     }
     this.columns = ClubberDetail.getUserColumns(this, "clubber")
   }
@@ -189,17 +189,19 @@ class Clubber extends Component {
 
   /*表格操作*/
   operateClick (flag, record, index) {
+    this.setState({
+      operateFlag: flag,
+      detailData: record
+    })
     if(flag === "detail") {
       this.setState({
         detaiVisible: true,
-        detailData: record
       })
     }
     else if(flag === "edit"){
       const dateFormat = 'YYYY-MM-DD';
       this.setState({
         addEditVisible: true,
-        detailData: record,
         addEditTitle: record.name + "信息编辑"
       })
       this.dialogUserInfo();
@@ -211,10 +213,6 @@ class Clubber extends Component {
         email: record.email,
         cardType: record.certiType,
         certiId: record.certiId,
-        workCity: record.workCity,
-        workPosition: record.workPosition,
-        cusDepartmentId: record.department,
-        cusInstitutionId: record.institutionsId,
         birth: record.birth === null ? "" : moment(record.birth, dateFormat),
         staffNo: record.staffNo,
         accountStatus: record.accountstatus
@@ -224,12 +222,8 @@ class Clubber extends Component {
     else if(flag === "delete"){
       this.setState({
         clubberDeleteVisible: true,
-        detailData: record
       })
     }
-    this.setState({
-      operateFlag: flag
-    })
   }
 
   /*账号状态修改*/
@@ -914,6 +908,14 @@ class Clubber extends Component {
         _this.setState({
           workPosition: list
         })
+        if(list.length !== 0 && this.state.operateFlag === "edit") {
+          if(_this.state.detailData.workPosition) {
+            let initInfo = {
+              workPosition: _this.state.detailData.workPosition
+            }
+            _this.props.form.setFieldsValue(initInfo)
+          }
+        }
       }
     }, (value) => {})
     /*获取工作城市*/
@@ -929,6 +931,14 @@ class Clubber extends Component {
         _this.setState({
           workCitys: list
         })
+        if(list.length !== 0 && this.state.operateFlag === "edit") {
+          if(_this.state.detailData.workCity) {
+            let initInfo = {
+              workCity: _this.state.detailData.workCity
+            }
+            _this.props.form.setFieldsValue(initInfo)
+          }
+        }
       }
     }, (value) => {})
     /*获取团体机构*/
@@ -944,6 +954,14 @@ class Clubber extends Component {
         _this.setState({
           institutions: list
         })
+        if(list.length !== 0 && this.state.operateFlag === "edit") {
+          if(this.state.detailData.institutionsId) {
+            let initInfo = {
+              cusInstitutionId: _this.state.detailData.institutionsId
+            }
+            _this.props.form.setFieldsValue(initInfo)
+          }
+        }
       }
     }, (value) => {})
     /*获取团体机构-组织*/
@@ -959,6 +977,14 @@ class Clubber extends Component {
         _this.setState({
           departments: list
         })
+        if(list.length !== 0 && this.state.operateFlag === "edit") {
+          if(_this.state.detailData.department) {
+            let initInfo = {
+              cusDepartmentId: _this.state.detailData.department
+            }
+            _this.props.form.setFieldsValue(initInfo)
+          }
+        }
       }
     }, (value) => {})
   }
