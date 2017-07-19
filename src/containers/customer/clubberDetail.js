@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { Form, Row, Col, Select, InputNumber, Button, Checkbox} from 'antd'
+import { Form, Row, Col, Select, InputNumber, Button, Checkbox, Icon} from 'antd'
 const FormItem = Form.Item;
+const Option = Select.Option;
 const modalItemLayout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 10 },
@@ -11,6 +12,9 @@ const UserDetail = {
     let value = [{
       label: "用户姓名",
       value: data.name
+    },{
+      label: "员工关系",
+      value: data.relKindName
     },{
       label: "用户账号",
       value: data.memberNo
@@ -33,8 +37,17 @@ const UserDetail = {
       label: "民族",
       value: data.nation
     },{
-      label: "员工号",
+      label: "员工号/会员号",
       value: data.staffNo
+    },{
+      label: "手机号",
+      value: data.mobile
+    },{
+      label: "工作城市",
+      value: data.workNatureName
+    },{
+      label: "角色/职位",
+      value: data.workPositionName
     }];
     return value
   },
@@ -267,11 +280,40 @@ const UserDetail = {
       },{
         title: '服务状态',
         key: 'serviceStatus',
-        dataIndex: "serviceStatus"
+        dataIndex: "serviceStatus",
+        filterDropdown: (<div className="custom-filter-dropdown">
+          <Select placeholder="请选择服务状态过滤" onChange={_this.serverStatusChange.bind(_this)} style={{width: 200}}>
+            <Option value="">全部状态</Option>
+            <Option value="00">未开始</Option>
+            <Option value="01">已取消</Option>
+            <Option value="02">待安排</Option>
+            <Option value="03">待确认</Option>
+            <Option value="04">安排中</Option>
+            <Option value="05">已安排</Option>
+            <Option value="06">已完成</Option>
+            <Option value="07">待推荐</Option>
+          </Select>
+        </div>),
+        filterIcon: <Icon type="filter" style={{ color: _this.state.filtered ? '#108ee9' : '#aaa' }} />,
       },{
         title: '支付状态',
         key: 'tranStatus',
-        dataIndex: "tranStatus"
+        dataIndex: "tranStatus",
+        filterDropdown: (<div className="custom-filter-dropdown">
+          <Select placeholder="请选择支付状态过滤" onChange={_this.tranStatusChange.bind(_this)} style={{width: 200}}>
+            <Option value="">全部状态</Option>
+            <Option value="00">待支付</Option>
+            <Option value="01">支付超时</Option>
+            <Option value="02">已支付</Option>
+            <Option value="03">申请退款</Option>
+            <Option value="04">已退款</Option>
+            <Option value="05">拒绝退款</Option>
+            <Option value="06">交易成功</Option>
+            <Option value="07">已评价</Option>
+            <Option value="08">未支付</Option>
+          </Select>
+        </div>),
+        filterIcon: <Icon type="filter" style={{ color: _this.state.filtered ? '#108ee9' : '#aaa' }} />,
       },{
         title: '订单时间',
         key: 'orderDate',
@@ -282,28 +324,32 @@ const UserDetail = {
         dataIndex: "appointServiceDate"
       },{
         title: '服务机构',
-        key: 'test',
-        dataIndex: "test"
+        key: 'hcuInstitutionsName',
+        dataIndex: "hcuInstitutionsName"
       },{
         title: '预约状态',
         key: 'reserveStatus',
         dataIndex: "reserveStatus",
         render: (text, record, index) => {
-          return <span>已预约</span>
+          return <span>已开始</span>
         }
       },{
         title: '操作',
         key: 'operate',
         dataIndex: 'operate',
         render: (text, record, index) => {
-          let changeItem = "";
+          let operateItem = "";
           if(record.serviceStatus === "待安排") {
-            changeItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
+            operateItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
+          }
+          else if(record.serviceStatus === "未开始") {
+            operateItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "continue")}><a>预约</a></span>
           }
           return <span className="table-operate">
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
-            {changeItem}
+            {operateItem}
             { record.serviceStatus === "已取消" ? "" : <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "cancel", record, index)}><a>取消</a></span>}
+            { record.serviceStatus === "已取消" ? <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "continue")}><a>重新预约</a></span> : ""}
           </span>
         },
       }]
@@ -330,7 +376,7 @@ const UserDetail = {
         key: 'reserveStatus',
         dataIndex: "reserveStatus",
         render: (text, record, index) => {
-          return <span>未预约</span>
+          return <span>未开始</span>
         }
       },{
         title: '操作',
@@ -339,7 +385,7 @@ const UserDetail = {
         render: (text, record, index) => {
           return <span className="table-operate">
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
-            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index)}><a>预约</a></span>
+            <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "init")}><a>预约</a></span>
           </span>
         },
       }]
@@ -521,14 +567,11 @@ const UserDetail = {
       label: "服务名称",
       value: el.pscName
     },{
-      label: "员工号",
-      value: el.memberNo
+      label: "员工号/会员号",
+      value: el.staffNo
     },{
       label: "总金额",
       value: el.totalMoney
-    },{
-      label: "支付日期",
-      value: el.payDate
     },{
       label: "预约服务日期",
       value: el.appointServiceDate

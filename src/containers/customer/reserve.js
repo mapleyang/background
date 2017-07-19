@@ -54,8 +54,6 @@ class Reserve extends Component {
       reserveTotal: 0,
       pageNumber: 0,
       tableLoading: false,
-      orgSelectValue: [],
-      orgList: [],
       serviceList: [],
       serviceValue: "",
       psc: "",
@@ -73,7 +71,10 @@ class Reserve extends Component {
       orderRangeDate: [],
       reserveRangDate: [],
       staffNo: "",
-      staffType: "staff"
+      staffType: "staff",
+      groupValue: [],
+      groupList: [],
+      reserveFlag: ""
     }
   }
 
@@ -158,7 +159,7 @@ class Reserve extends Component {
           condition: orderData,
           serviceValue: service.data.list[0].value,
         })
-        _this.getOrgInfo(clubberOrgData);
+        _this.getServiceGroup(clubberOrgData);
       }
     }, (service) => {})
   }
@@ -185,94 +186,135 @@ class Reserve extends Component {
     })
   }
 
-  getOrgInfo (data) {
-    const _this = this;
-    let clubberOrgUrl = "/chealth/background/ajaxBusiness/loadCustInstitutionsList";
-    Operate.getResponse(clubberOrgUrl, data, "POST", "html").then((value) => {
-      if(value.success === "true") {
-        let list = [];
-        value.data.list.forEach(el => {
-          if(el.value) {
-            el.isLeaf = false;
-            list.push(el)
-          }
-        })
-        _this.setState({
-          orgList: list
-        })
-      }
-    }, (value) => {})
-  }
-
   /*表格操作*/
-  operateClick (flag, record, index) {
+  operateClick (flag, record, index, reserveFlag) {
     const _this = this;
+    this.setState({
+      operateType: flag,
+      reserveFlag: reserveFlag
+    })
     if(flag === "detail") {
       this.setState({
         detailVisible: true,
-        detailData: record
+        detailData: record,
       })
     }
     else if(flag === "reserve"){
-      this.setState({
-        reserveVisible: true,
-        detailData: record,
-      })
-      let packageData = {
-        cusId: this.state.cusId,
-        custPscId: this.state.custPscId,
-        recordId: 0,            
-        relRecordId: 0,         
-        memberId: record.memberId,    
-        refHcuPackageId: 0,
-        psc: this.state.psc      
-      }
-      this.getPackageList(packageData);
-      let data = {
-        cusId: this.state.cusId,
-        custPscId: this.state.custPscId 
-      }
-      this.getProvinceList(data);
-      setTimeout(function () {
-        let staffBirthday = "";
-        if(record.birthYear !== null) {
-          let month = parseInt(record.birthMonth) < 10 ? "0" + record.birthMonth : record.birthMonth;
-          let day = parseInt(record.birthDay) < 10 ? "0" + record.birthDay : record.birthDay;
-          staffBirthday = record.birthYear + "-" + month + "-" + day;
+      if(reserveFlag === "init") {
+        this.setState({
+          reserveVisible: true,
+          detailData: record
+        })
+        let packageData = {
+          cusId: this.state.cusId,
+          custPscId: this.state.custPscId,
+          recordId: 0,            
+          relRecordId: 0,         
+          memberId: record.memberId,    
+          refHcuPackageId: 0,
+          psc: this.state.psc      
         }
-        let initInfo = {
-          staffMemberName: record.nameChs,
-          staffMemberNo: "",
-          staffSex: record.sex,
-          staffMarital: record.marital,
-          hcuPackageId: "",
-          staffCertiId: record.certiId,
-          staffCertiType: record.certiType,
-          staffMobile: record.mobile,
-          staffEmail: record.email,
-          staffBirthday: staffBirthday !== "" ? moment(staffBirthday, 'YYYY-MM-DD') : "",
-          appointServiceTime: "",
-          areaValue: [],
-          hcuInstitutionId: "",
-          sendRmdKbn: "0"
+        this.getPackageList(packageData);
+        let data = {
+          cusId: this.state.cusId,
+          custPscId: this.state.custPscId 
         }
-        _this.props.form.setFieldsValue(initInfo)
-      }, 100)
+        setTimeout(function () {
+          let staffBirthday = "";
+          if(record.birthYear !== null) {
+            let month = parseInt(record.birthMonth) < 10 ? "0" + record.birthMonth : record.birthMonth;
+            let day = parseInt(record.birthDay) < 10 ? "0" + record.birthDay : record.birthDay;
+            staffBirthday = record.birthYear + "-" + month + "-" + day;
+          }
+          let initInfo = {
+            staffMemberName: record.nameChs,
+            staffNo: record.staffNo,
+            staffSex: record.sex,
+            staffMarital: record.marital,
+            hcuPackageId: "",
+            staffCertiId: record.certiId,
+            staffCertiType: record.certiType,
+            staffMobile: record.mobile,
+            staffEmail: record.email,
+            staffBirthday: staffBirthday !== "" ? moment(staffBirthday, 'YYYY-MM-DD') : "",
+            appointServiceTime: "",
+            areaValue: [],
+            hcuInstitutionId: "",
+            sendRmdKbn: "0"
+          }
+          _this.props.form.setFieldsValue(initInfo)
+        }, 100)
+      }
+      else {
+        this.setState({
+          reserveVisible: true,
+          detailData: record,
+          hcuPackageId: record.hcuPackageId ? record.hcuPackageId : ""
+        })
+        let packageData = {
+          cusId: this.state.cusId,
+          custPscId: this.state.custPscId,
+          recordId: 0,            
+          relRecordId: 0,         
+          memberId: record.memberId,    
+          refHcuPackageId: 0,
+          psc: this.state.psc      
+        }
+        this.getPackageList(packageData);
+        let data = {
+          cusId: this.state.cusId,
+          custPscId: this.state.custPscId 
+        }
+        setTimeout(function () {
+          let staffBirthday = "";
+          if(record.birthYear !== null) {
+            let month = parseInt(record.staffBirthMonth) < 10 ? "0" + record.staffBirthMonth : record.staffBirthMonth;
+            let day = parseInt(record.staffBirthDay) < 10 ? "0" + record.staffBirthDay : record.staffBirthDay;
+            staffBirthday = record.staffBirthYear + "-" + month + "-" + day;
+          }
+          let areaValue = [];
+          if(record.parplmId && record.cityId) {
+            areaValue = [record.parplmId, record.cityId]
+          }
+          let initInfo = {
+            staffMemberName: record.staffNameChs,
+            staffNo: record.staffNo,
+            staffSex: record.staffSex,
+            staffMarital: record.staffMarital,
+            hcuPackageId: record.hcuPackageId ? record.hcuPackageId.toString() : "",
+            staffCertiId: record.staffCertiId,
+            staffCertiType: record.staffCertiType,
+            staffMobile: record.staffMobile,
+            staffEmail: record.staffEmail,
+            staffBirthday: staffBirthday !== "" ? moment(staffBirthday, 'YYYY-MM-DD') : "",
+            appointServiceTime: record.appointServiceDate !== null ? moment(record.appointServiceDate, 'YYYY-MM-DD') : "",
+            areaValue: areaValue,
+            hcuInstitutionId: record.hcuInstitutionsId ? record.hcuInstitutionsId : "",
+            sendRmdKbn: record.sendMailKbn
+          }
+          _this.props.form.setFieldsValue(initInfo)
+        }, 500)
+      }
     }
-    else if (flag === "change") {
+    else if(flag === "change") {
       this.setState({
         reserveVisible: true,
         detailData: record,
+        hcuPackageId: record.hcuPackageId,
       })
       let data = {
         cusId: record.cusId,
         custPscId: record.custPscId 
       }
       this.getProvinceList(data);
+      let areaValue = [];
+      if(record.parplmId && record.cityId) {
+        areaValue = [record.parplmId, record.cityId]
+      }
       let initInfo = {
-        areaValue: [],
-        hcuInstitutionId: "",
-        appointServiceTime:  moment(record.appointServiceDate, 'YYYY-MM-DD'),
+        areaValue: areaValue,
+        hcuInstitutionId: record.hcuInstitutionsId ? record.hcuInstitutionsId : "",
+        appointServiceTime: moment(record.appointServiceDate, 'YYYY-MM-DD'),
         sendRmdKbn: "0"
       }
       this.props.form.setFieldsValue(initInfo);
@@ -308,9 +350,6 @@ class Reserve extends Component {
         },
       });
     }
-    this.setState({
-      operateType: flag
-    })
   }
 
   /*获取省市*/
@@ -329,13 +368,16 @@ class Reserve extends Component {
         _this.setState({
           area: list
         })
-        if(this.state.operateType === "change") {
-          provinceData.parplmId = this.state.detailData.parplmId;
+        if(this.state.operateType === "change" || this.state.reserveFlag === "continue") {
+          if(this.state.detailData.parplmId) {
+            provinceData.parplmId = this.state.detailData.parplmId;
+            _this.getCityList(provinceData)
+          }
         }
         else {
           provinceData.parplmId = list[0].value;
+          _this.getCityList(provinceData)
         }
-        _this.getCityList(provinceData)
       }
     }, (value) => {})
   } 
@@ -372,7 +414,7 @@ class Reserve extends Component {
         if(_this.state.hcuReserveFlg === "1") {   //已经预约
           //服务机构下拉框
           initInfo.areaValue = [_this.state.detailData.parplmId.toString(), _this.state.detailData.cityId.toString()]
-          institutionData.hcuPackageId = _this.state.detailData.hcuPackageId;
+          institutionData.hcuPackageId = _this.state.hcuPackageId;
           institutionData.ParplmId = data.parplmId;
           institutionData.CityId = _this.state.detailData.cityId;
           _this.getInstitutionOptions(institutionData);
@@ -429,7 +471,6 @@ class Reserve extends Component {
       let countyUrl = "/chealth/background/ajaxBusiness/loadCustCityListInParplm"
       Operate.getResponse(countyUrl, data, "POST", "html").then((value) => {
         if(value.success === "true") {
-
         }
       }, (value) => {});
     }
@@ -481,11 +522,14 @@ class Reserve extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         let data = {
-          appointServiceTime: moment(values.appointServiceTime._i).format("YYYYMMDD"),
-          hcuInstitutionId: values.hcuInstitutionId
+          appointServiceDate: moment(values.appointServiceTime._i).format("YYYYMMDD"),
+          sendRmdKbn: values.sendRmdKbn,
+          hcuInstitutionId: values.hcuInstitutionId,
+          parplmId: values.areaValue[0],
+          cityId: values.areaValue[1]
         }
         if(this.state.operateType === "change") {
-          data.grouprecordId = this.state.detailData.grouprecordId
+          data.purchaseOrderId = this.state.detailData.grouprecordId
         }
         else {
           let date = new Date(values.staffBirthday);
@@ -496,12 +540,13 @@ class Reserve extends Component {
           data.custPscId = this.state.custPscId;
           data.psc = this.state.psc;
           data.staffMemberId = this.state.detailData.memberId;
-          data.staffMemberNo = values.staffMemberNo;
+          data.staffNo = values.staffNo;
           data.staffMemberName = values.staffMemberName;
           data.staffSex = values.staffSex;
           data.hcuPackageId = values.hcuPackageId;
           data.staffCertiType = values.staffCertiType;
           data.staffCertiId = values.staffCertiId;
+          data.staffMarital = values.staffMarital;
           data.staffMobile = values.staffMobile;
           data.staffEmail = values.staffEmail;
           if(this.state.addFreeHcuItemDtoList.length) {
@@ -600,9 +645,7 @@ class Reserve extends Component {
       accountStatus: "00",
       loginAccount: "",
       mobile: "",
-      orgSelectValue: [],
       cusId: this.state.projectData[0].cusId,
-      hcuReserveFlg: "",
       custPscId: "",
       psc: "",
       staffNo: "",
@@ -613,7 +656,8 @@ class Reserve extends Component {
       reserveRangDate: [],
       staffType: "staff",
       custProjectId: this.state.projectData[0].custProjectId,
-      pageNumber: 1
+      pageNumber: 1,
+      groupValue: [],
     })
     let serviceData = {
       custProjectId: this.state.projectData[0].custProjectId,
@@ -736,58 +780,6 @@ class Reserve extends Component {
       }, (value) => {})
     }
   }
-
-  /*组织机构选择事迹*/
-  orgSelectChange (value) {
-    let data = this.state.condition;
-    if(value.length === 1) {
-      data.cusInstitutionId = value[0];
-    }
-    else {
-      data.cusInstitutionId = value[0];
-      data.cusDepartmentId = value[1];
-    }
-    this.getOrderInfo(data);
-    this.setState({
-      orgSelectValue: value
-    })
-  }
-
-  /*机构加载*/
-  orgLoadData = (selectedOptions) => {
-    const _this = this;
-    const targetOption = selectedOptions[selectedOptions.length - 1];
-    targetOption.loading = true;
-    if(selectedOptions.length === 1) {
-      let departmentUrl = "/chealth/background/ajaxBusiness/loadCustDepartmentsList";
-      let departmentData = {
-        cusInstitutionsId: selectedOptions[0].value
-      }
-      Operate.getResponse(departmentUrl, departmentData, "POST", "html").then((value) => {
-        targetOption.loading = false;
-        if(value.success === "true"){
-          let list = [];
-          value.data.list.forEach(el => {
-            if(el.value) {
-              list.push(el)
-            }
-          })
-          let orgList = [];
-          orgList = this.state.orgList.map(el => {
-            if(el.value === selectedOptions[0].value) {
-              el.children = list;
-              el.isLeaf = list.length === 0 ? true : false;
-            }
-            return el;
-          })
-          _this.setState({
-            orgList: orgList
-          })
-        }
-      }, (value) => {})
-    }
-  }
-
   /*产品服务选择事件*/
   serviceChange (value) {
     let data = this.state.condition;
@@ -803,8 +795,8 @@ class Reserve extends Component {
       custPscId: serviceObject.custPscId,
       psc: serviceObject.psc,
       condition: data,
-      orgSelectValue: [],
       serviceValue: value,
+      groupValue: [],
     })
     this.getOrderInfo(data);
     this.getOrgInfo(clubberOrgData);
@@ -930,7 +922,7 @@ class Reserve extends Component {
   getDialogItem () {
     const { getFieldDecorator } = this.props.form;
     const prefixSelector = getFieldDecorator('staffCertiType')(
-      <Select style={{ width: 80 }}>
+      <Select disabled={true} style={{ width: 80 }}>
         {this.state.idCardType.map(el => {
           return <Option value={el.value}>{el.label}</Option>
         })}
@@ -947,9 +939,11 @@ class Reserve extends Component {
               label="用户姓名"
               hasFeedback>     
               {getFieldDecorator('staffMemberName', {
-                rules: [{ required: true }],
+                rules: [{
+                  required: true, message: '请到用户信息页面完善该用户信息!',
+                }]
               })(             
-                <Input placeholder="请输入用户姓名"/>
+                <Input placeholder="请输入用户姓名" disabled={true}/>
               )}
             </FormItem>
           </Col>
@@ -958,10 +952,12 @@ class Reserve extends Component {
               {...modalItemLayout}
               label="员工/会员号"
               hasFeedback>     
-              {getFieldDecorator('staffMemberNo', {
-                  rules: [{ required: true }],
+              {getFieldDecorator('staffNo', {
+                  rules: [{
+                    required: true, message: '请到用户信息页面完善该用户信息!',
+                  }]
                 })(             
-                <Input placeholder="请输入员工号或会员号"/>
+                <Input placeholder="请输入员工号或会员号" disabled={true}/>
               )}
             </FormItem>
           </Col>
@@ -973,9 +969,11 @@ class Reserve extends Component {
                 label="用户性别"
                 hasFeedback>     
                 {getFieldDecorator('staffSex', {
-                  rules: [{ required: true }],
+                  rules: [{
+                    required: true, message: '请到用户信息页面完善该用户信息!',
+                  }]
                 })(              
-                  <Select>
+                  <Select disabled={true}>
                     <Option value="1">男</Option>
                     <Option value="2">女</Option>
                   </Select>     
@@ -988,9 +986,11 @@ class Reserve extends Component {
               label="婚姻状况"
                 hasFeedback>    
                   {getFieldDecorator('staffMarital', {
-                    rules: [{ required: true }],
+                    rules: [{
+                      required: true, message: '请到用户信息页面完善该用户信息!',
+                    }]
                   })(
-                    <Select>
+                    <Select disabled={true}>
                       <Option value="2">已婚</Option>
                       <Option value="1">未婚</Option>
                     </Select>          
@@ -1005,9 +1005,11 @@ class Reserve extends Component {
                 label="出生年月"
                 hasFeedback>     
                 {getFieldDecorator('staffBirthday', {
-                rules: [{ required: true }],
+                  rules: [{
+                    required: true, message: '请到用户信息页面完善该用户信息!',
+                  }]
                 })(              
-                  <DatePicker style={{ width: '100%' }}/>    
+                  <DatePicker disabled={true} style={{ width: '100%' }}/>    
                 )}
               </FormItem>
           </Col>
@@ -1017,9 +1019,11 @@ class Reserve extends Component {
               label="身份证件号"
               hasFeedback>    
               {getFieldDecorator('staffCertiId', {
-                rules: [{ required: true }],
+                rules: [{
+                  required: true, message: '请到用户信息页面完善该用户信息!',
+                }]
               })(
-                <Input placeholder="请输入证件号" addonBefore={prefixSelector} style={{ width: '100%' }} />
+                <Input disabled={true} placeholder="请输入证件号" addonBefore={prefixSelector} style={{ width: '100%' }} />
               )}
             </FormItem>
           </Col>
@@ -1031,9 +1035,11 @@ class Reserve extends Component {
               label="用户手机"
               hasFeedback>     
               {getFieldDecorator('staffMobile', {
-                rules: [{ required: true }],
+                rules: [{
+                  required: true, message: '请到用户信息页面完善该用户信息!',
+                }]
               })(              
-                <Input placeholder="请输入用户手机"/>
+                <Input disabled={true} placeholder="请输入用户手机"/>
               )}
             </FormItem>
           </Col>
@@ -1043,9 +1049,8 @@ class Reserve extends Component {
               label="用户邮箱"
               hasFeedback>    
               {getFieldDecorator('staffEmail', {
-                rules: [{ required: true }],
               })(
-                <Input placeholder="请输入用户邮箱"/>
+                <Input disabled={true} placeholder="请输入用户邮箱"/>
               )} 
             </FormItem>
           </Col>
@@ -1058,7 +1063,9 @@ class Reserve extends Component {
               label="服务套餐"
               hasFeedback>     
               {getFieldDecorator('hcuPackageId', {
-                  rules: [{ required: true }],
+                  rules: [{
+                    required: true, message: '请到用户信息页面完善该用户信息!',
+                  }]
                 })(            
                 <Select style={{ width: "100%" }} onChange={this.packageChange.bind(this)}>
                   {this.state.packageList.map(el => {
@@ -1115,7 +1122,7 @@ class Reserve extends Component {
             list.push(el)
           }
         })
-        if(list.length) {
+        if(list.length !== 0) {
           let initInfo = {
             hcuPackageId: list[0].value,
           }
@@ -1125,11 +1132,12 @@ class Reserve extends Component {
             custPscId: this.state.custPscId,           
             hcuPackageId: list[0].value         
           }
-          _this.getPackageInfo(packageInfoData);
           _this.setState({
             packageList: list,
             hcuPackageId: list[0].value
           })
+          _this.getPackageInfo(packageInfoData);
+          _this.getProvinceList(packageData);
         }
       }
     }, (value) => {})
@@ -1180,7 +1188,16 @@ class Reserve extends Component {
           }
           let initInfo = {}
           if(this.state.operateType === "change") {
-            initInfo.hcuInstitutionId = _this.state.detailData.hcuInstitutionsId.toString();
+            let flag = false;
+            value.data.list.forEach(el => {
+              if(el.value === _this.state.detailData.hcuInstitutionsId.toString()) {
+                flag = true;
+                initInfo.hcuInstitutionId = _this.state.detailData.hcuInstitutionsId.toString();
+              }
+            })
+            if(!flag) {
+              initInfo.hcuInstitutionId =  value.data.list[0].value;
+            }
             _this.getInstitutionDate(_this.state.detailData.hcuInstitutionsId);
           }
           else {
@@ -1384,6 +1401,94 @@ class Reserve extends Component {
     })
   }
 
+  /*服务集团机构选择事件*/
+  groupSelectChange (value) {
+    let data = this.state.condition;
+    if(value.length === 1) {
+      data.hcuGroupId = value[0];
+    }
+    else {
+      data.hcuGroupId = value[0];
+      data.hcuInstitutionsId = value[1];
+    }
+    this.getOrderInfo(data);
+    this.setState({
+      groupValue: value
+    })
+  }
+  /*服务集团*/
+  getServiceGroup (groupData) {
+    const _this = this;
+    let groupUrl = "/chealth/background/ajaxBusiness/loadCustHcuGrouptList";
+    Operate.getResponse(groupUrl, groupData, "POST", "html").then((value) => {
+      if(value.success === "true") {
+        let list = [];
+        value.data.list.forEach(el => {
+          if(el.value) {
+            el.isLeaf = false;
+            list.push(el)
+          }
+        })
+        _this.setState({
+          groupList: list
+        })
+      }
+    }, (value) => {})
+  }
+
+  /*服务集团、机构级联事件*/
+  groupLoadData = (selectedOptions) => {
+    const _this = this;
+    const targetOption = selectedOptions[selectedOptions.length - 1];
+    targetOption.loading = true;
+    if(selectedOptions.length === 1) {
+      let institutionUrl = "/chealth/background/ajaxBusiness/loadCustHcuInstitutionsInGroup";
+      let institutionData = {
+        cusId: this.state.cusId,              
+        custPscId: this.state.custPscId,               
+        hcuGroupId: selectedOptions[0].value              
+      }
+      Operate.getResponse(institutionUrl, institutionData, "POST", "html").then((value) => {
+        targetOption.loading = false;
+        if(value.success === "true"){
+          let list = [];
+          value.data.list.forEach(el => {
+            if(el.value) {
+              list.push(el)
+            }
+          })
+          let groupList = [];
+          groupList = this.state.groupList.map(el => {
+            if(el.value === selectedOptions[0].value) {
+              el.children = list;
+              el.isLeaf = list.length === 0 ? true : false;
+            }
+            return el;
+          })
+          _this.setState({
+            groupList: groupList
+          })
+        }
+      }, (value) => {})
+    }
+  }
+
+  serverStatusChange (value) {
+    let data = this.state.condition;
+    if(value !== "") {
+      data.serviceStatus = value;
+    }
+    this.getOrderInfo(data);
+  }
+
+  tranStatusChange (value) {
+    let data = this.state.condition;
+    if(value !== "") {
+      data.TranStatus = value;
+    }
+    this.getOrderInfo(data);
+  }
+
   render() {
     return (
       <div className="right-content">
@@ -1404,15 +1509,15 @@ class Reserve extends Component {
                 </Col>
                 <Col span={8}>
                   <FormItem
-                  {...formItemLayout}
-                    label="机构组织">                  
+                    {...formItemLayout}
+                    label="集团/机构">
                     <Cascader 
-                      placeholder="请选择机构组织" 
+                      placeholder="请选择集团、机构" 
                       style={{width: "100%"}} 
-                      value={this.state.orgSelectValue} 
-                      options={this.state.orgList} 
-                      loadData={this.orgLoadData} 
-                      onChange={this.orgSelectChange.bind(this)} 
+                      value={this.state.groupValue} 
+                      options={this.state.groupList} 
+                      loadData={this.groupLoadData} 
+                      onChange={this.groupSelectChange.bind(this)} 
                       changeOnSelect />
                   </FormItem>
                 </Col>
@@ -1499,8 +1604,8 @@ class Reserve extends Component {
                   {...formItemLayoutFirstCell}
                   label="预约状态">                  
                     <RadioGroup onChange={this.hcuReserveFlgChange} value={this.state.hcuReserveFlg}>
-                      <Radio value="1">已预约</Radio>
-                      <Radio value="2">未预约</Radio>
+                      <Radio value="1">已开始</Radio>
+                      <Radio value="2">未开始</Radio>
                     </RadioGroup>
                 </FormItem>
               </Col>
