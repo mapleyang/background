@@ -168,7 +168,6 @@ class ClubberImport extends Component {
     return item;
   }
 
-
   render() {
     const { getFieldDecorator } = this.props.form;
     let data = {
