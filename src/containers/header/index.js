@@ -119,9 +119,9 @@ class Header extends Component {
     return (
       <div className="header-area">
         <Row className="header-row-menu">
-          <Col span={3} className="header-logo">
+          <Col span={4} className="header-logo">
             <img src="/chealth/img/background/viewfile.png" />
-            <div className="header-name"><span>电商配置</span></div>
+            <div className="header-name"><span>健康平台后台系统</span></div>
           </Col>
           <Col span={17} className="menu-col">
               <Menu

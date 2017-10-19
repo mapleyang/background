@@ -292,53 +292,88 @@ class Clubber extends Component {
     const _this = this;
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        let data = {};
-        for(let key in values) {
-          if(key === "birth") {
-            let date = new Date(values[key]._d)
-            data.birthYear = date.getFullYear();
-            data.birthMonth = date.getMonth() + 1;
-            data.birthDay = date.getDate();
+        if(values.cardType === "1") {
+          let date = new Date(values.birth._d)
+          let birthMonth = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+          let birthDay = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+          let birth = date.getFullYear() + '-' + birthMonth + '-' + birthDay;
+          let idCard = values.certiId;
+          let birthdayStr = "";  
+          if (15 == idCard.length) {  
+            birthdayStr = idCard.charAt(6) + idCard.charAt(7);  
+            if (parseInt(birthdayStr) < 10) {  
+              birthdayStr = '20' + birthdayStr;  
+            } else {  
+              birthdayStr = '19' + birthdayStr;  
+            }  
+            birthdayStr = birthdayStr + '-' + idCard.charAt(8) + idCard.charAt(9) + '-' + idCard.charAt(10) + idCard.charAt(11);  
+          }else if (18 == idCard.length) {  
+            birthdayStr = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9) + '-' + idCard.charAt(10) + idCard.charAt(11) + '-' + idCard.charAt(12) + idCard.charAt(13);  
+          }  
+          if(birth === birthdayStr) {
+            this.excuteUserInfoChange(values)
           }
           else {
-            data[key] = values[key];
+            Modal.warning({
+              title: '身份证生日和生日填写不一致',
+              content: '请再次确认生日和身份证中生日信息是否一致！',
+            });
           }
         }
-        if(_this.state.operateFlag === "edit") {
-          data.cusId = _this.state.cusId;
-          data.memberId = _this.state.detailData.memberId;
-          let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberInfo/saveEdit";
-          Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
-            if(value.success === "true") {
-              _this.getClubberInfo(_this.state.condition)
-              _this.setState({
-                addEditVisible: false
-              })
-              message.success("用户编辑成功！")
-            }
-            else {
-              message.error("用户编辑失败！")
-            }
-          }, (value) => {})
-        }
         else {
-          data.custProjectId = _this.state.projectValue;
-          let clubberAddUrl = "/chealth/background/cusServiceOperation/memberInfo/saveCreate";
-          Operate.getResponse(clubberAddUrl, data, "POST", "html").then((value) => {
-            if(value.success === "true") {
-              _this.getClubberInfo(_this.state.condition)
-              _this.setState({
-                addEditVisible: false
-              })
-              message.success("用户新增成功！")
-            }
-            else{
-              message.error("用户新增失败！")
-            }
-          }, (value) => {})
+          this.excuteUserInfoChange(values)
         }
       }
     });
+  }
+
+  excuteUserInfoChange (values) {
+    const _this = this;
+    let data = {};
+    for(let key in values) {
+      if(key === "birth") {
+        let date = new Date(values[key]._d)
+        data.birthYear = date.getFullYear();
+        data.birthMonth = date.getMonth() + 1;
+        data.birthDay = date.getDate();
+      }
+      else {
+        data[key] = values[key];
+      }
+    }
+    if(_this.state.operateFlag === "edit") {
+      data.cusId = _this.state.cusId;
+      data.memberId = _this.state.detailData.memberId;
+      let clubberSaveUrl = "/chealth/background/cusServiceOperation/memberInfo/saveEdit";
+      Operate.getResponse(clubberSaveUrl, data, "POST", "html").then((value) => {
+        if(value.success === "true") {
+          _this.getClubberInfo(_this.state.condition)
+          _this.setState({
+            addEditVisible: false
+          })
+          message.success("用户编辑成功！")
+        }
+        else {
+          message.error("用户编辑失败！")
+        }
+      }, (value) => {})
+    }
+    else {
+      data.custProjectId = _this.state.projectValue;
+      let clubberAddUrl = "/chealth/background/cusServiceOperation/memberInfo/saveCreate";
+      Operate.getResponse(clubberAddUrl, data, "POST", "html").then((value) => {
+        if(value.success === "true") {
+          _this.getClubberInfo(_this.state.condition)
+          _this.setState({
+            addEditVisible: false
+          })
+          message.success("用户新增成功！")
+        }
+        else{
+          message.error("用户新增失败！")
+        }
+      }, (value) => {})
+    }
   }
 
   /*用户删除*/
@@ -621,7 +656,9 @@ class Clubber extends Component {
                 label="身份证件号"
                 hasFeedback>                  
                 {getFieldDecorator('certiId', {
-                    rules: [{ required: true, message: '请输入对应的身份证件号' }],
+                    rules: [{ required: true, message: '请输入对应的身份证件号' },{
+                    // validator: this.checkBirth,
+                  }],
                   })(
                   <Input placeholder="请输入身份证件号"/>
                 )}
@@ -772,6 +809,21 @@ class Clubber extends Component {
     </Form>
     return item;
   }
+
+  // checkBirth = (rule, value, callback) => {
+  //   const form = this.props.form;
+  //   if (value && form.getFieldValue('birth') && form.getFieldValue('cardType') === "1") {
+  //     let date = new Date(form.getFieldValue('birth')._d);
+  //     console.log(date)
+  //     console.log(value.length)
+  //     if(value.length === 18) {
+        
+  //     }
+  //     callback('身份证号的生日信息请与生日信息一致');
+  //   } else {
+  //     callback();
+  //   }
+  // }
 
   onAreaChange = (value, selectedOptions) => {
     console.log(selectedOptions);

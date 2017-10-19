@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message  } from 'antd'
+import { Table, Select, Form, Input, Button, Row, Col, Radio, Cascader, Modal, DatePicker, message ,Calendar } from 'antd'
 import './index.scss'
 import UserInfo from "../../utils/userInfo"
 import ClubberDetail from "./clubberDetail"
@@ -143,7 +143,6 @@ class Reserve extends Component {
         let orderData = {
           cusId: cusId,     
           custPscId: serviceObject.custPscId,     
-          hcuReserveFlg: this.state.hcuReserveFlg,
           pageNumber: 1,
         };
         _this.getOrderInfo(orderData);
@@ -504,7 +503,7 @@ class Reserve extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         let data = {
-          appointServiceDate: moment(values.appointServiceTime._i).format("YYYYMMDD"),
+          appointServiceDate: moment(values.appointServiceTime._d).format("YYYYMMDD"),
           sendRmdKbn: values.sendRmdKbn,
           hcuInstitutionId: values.hcuInstitutionId,
           parplmId: values.areaValue[0],
@@ -1303,33 +1302,33 @@ class Reserve extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="服务日期选择"
-                hasFeedback>  
-                  {getFieldDecorator('appointServiceTime', {
-                    rules: [{ required: true }],
-                  })(     
-                  <DatePicker
-                    placeholder="请选择服务日期"
-                    format="YYYY-MM-DD"
-                    style={{width: "100%"}}
-                    disabledDate={this.disabledDate.bind(this)}/>   
-                  )}             
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                {...modalItemLayout}
                 label="是否通知信息"
                 hasFeedback>  
-                  {getFieldDecorator('sendRmdKbn', {
-                    rules: [{ required: true }],
-                  })(     
+                  {getFieldDecorator('sendRmdKbn')(     
                     <RadioGroup>
                       <Radio value="0">否</Radio>
                       <Radio value="1">是</Radio>
                     </RadioGroup>
                   )}             
               </FormItem>
+            </Col>
+            <Col span={12}>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <FormItem
+                {...modalItemLayout}
+                label="服务日期"
+                hasFeedback>  
+                  {getFieldDecorator('appointServiceTime')( 
+                  <div className="table-calendar" style={{ width: 400, border: '1px solid #d9d9d9', borderRadius: 4 }}>
+                    <Calendar fullscreen={false} dateCellRender={this.dateCellRender} disabledDate={this.disabledDate.bind(this)} />
+                  </div> 
+                  )}             
+              </FormItem>
+            </Col>
+            <Col span={12}>
             </Col>
           </Row>
         </div>
@@ -1338,10 +1337,16 @@ class Reserve extends Component {
     return item;
   }
 
+  dateCellRender(value) {
+    return (
+      <span style={{color: "rgba(0,0,0,.25)"}}>0/0</span>
+    );
+  }
+
   disabledDate(current) {
     let flag = true;
     if(current) {
-      if(this.state.reserveDateList.length) {
+      if(this.state.reserveDateList && this.state.reserveDateList.length) {
         this.state.reserveDateList.forEach(el => {
           let reserveDate = new Date(moment(el.label));
           let reserveTime = reserveDate.getFullYear() + "-" + reserveDate.getMonth() + "-" + reserveDate.getDate();
@@ -1638,7 +1643,7 @@ class Reserve extends Component {
           visible={this.state.reserveVisible}
           onOk={this.reservehandleOk}
           onCancel={this.reserveHandleCancel}
-          width={800}>
+          width={1000}>
           {this.getResverFormItem()}
         </Modal>
         <Modal

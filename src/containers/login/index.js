@@ -60,29 +60,35 @@ class Login extends Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="login">
-        <div className="login-content">
+        <div className="login-contents">
           <div className="login-area">
-             <Form onSubmit={this.handleSubmit} className="login-form">
-              <FormItem>
-                {getFieldDecorator('userName', {
-                  rules: [{ required: true, message: 'Please input your username!' }],
-                })(
-                  <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="请输入用户名" />
-                )}
-              </FormItem>
-              <FormItem>
-                {getFieldDecorator('password', {
-                  rules: [{ required: true, message: 'Please input your Password!' }],
-                })(
-                  <Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type="password" placeholder="请输入密码" />
-                )}
-              </FormItem>
-              <FormItem>
-                <Button type="primary" htmlType="submit" className="login-form-button" loading={this.state.loading}>
-                  登陆
-                </Button>
-              </FormItem>
-            </Form>
+            <Row>
+              <Col span={16}>
+              </Col>
+              <Col span={8}>
+                <Form onSubmit={this.handleSubmit} className="login-form">
+                  <FormItem>
+                    {getFieldDecorator('userName', {
+                      rules: [{ required: true, message: '请输入用户名!' }],
+                    })(
+                      <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="请输入用户名" />
+                    )}
+                  </FormItem>
+                  <FormItem>
+                    {getFieldDecorator('password', {
+                      rules: [{ required: true, message: '请输入密码' }],
+                    })(
+                      <Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type="password" placeholder="请输入密码" />
+                    )}
+                  </FormItem>
+                  <FormItem style={{marginBottom: "6px"}}>
+                    <Button type="primary" htmlType="submit" className="login-form-button" loading={this.state.loading}>
+                      登录
+                    </Button>
+                  </FormItem>
+                </Form>
+              </Col>
+            </Row>
           </div>
         </div>
         <div className="footer"><Footer /></div>
@@ -93,3 +99,4 @@ class Login extends Component {
 
 export default Login = Form.create({
 })(Login);
+                // <img src=".//chealth/img/background/test.jpg" />
