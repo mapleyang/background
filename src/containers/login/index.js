@@ -24,7 +24,7 @@ class Login extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         var body = {
-          email: values.userName,
+          email: values.userName.trim(),
           password: values.password,
         }
         window.$.ajax({

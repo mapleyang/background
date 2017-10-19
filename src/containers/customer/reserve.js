@@ -1237,9 +1237,9 @@ class Reserve extends Component {
     let reserveDateUrl = "/chealth/background/cusServiceOperation/hcuReserve/loadCusHcuInstitutionPermissionDate";
     Operate.getResponse(reserveDateUrl, data, "POST", "html").then((value) => {
       if(value.success === "true") {
-        if(value.data.list.length) {
+        if(value.data.rows.length) {
           _this.setState({
-            reserveDateList: value.data.list
+            reserveDateList: value.data.rows
           })
           if(_this.state.operateType === "change") {
             let initInfo = {
@@ -1319,11 +1319,10 @@ class Reserve extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="服务日期"
-                hasFeedback>  
+                label="服务日期">  
                   {getFieldDecorator('appointServiceTime')( 
                   <div className="table-calendar" style={{ width: 400, border: '1px solid #d9d9d9', borderRadius: 4 }}>
-                    <Calendar fullscreen={false} dateCellRender={this.dateCellRender} disabledDate={this.disabledDate.bind(this)} />
+                    <Calendar fullscreen={false} dateCellRender={this.dateCellRender.bind(this)} disabledDate={this.disabledDate.bind(this)} />
                   </div> 
                   )}             
               </FormItem>
@@ -1337,10 +1336,22 @@ class Reserve extends Component {
     return item;
   }
 
-  dateCellRender(value) {
-    return (
-      <span style={{color: "rgba(0,0,0,.25)"}}>0/0</span>
-    );
+  dateCellRender(current) {
+    let label = "";
+    if(current) {
+      if(this.state.reserveDateList && this.state.reserveDateList.length) {
+        this.state.reserveDateList.forEach(el => {
+          let reserveDate = new Date(moment(el.calendarYmd));
+          let reserveTime = reserveDate.getFullYear() + "-" + reserveDate.getMonth() + "-" + reserveDate.getDate();
+          let currentDate = new Date(current);
+          let currentTime = currentDate.getFullYear() + "-" + currentDate.getMonth() + "-" + currentDate.getDate();
+          if(reserveTime === currentTime) {
+            label = el.currentReseverationNumber + '/' + el.reserveLimit;
+          }
+        })
+      }
+    }
+    return <span style={{color: "rgba(0,0,0,.25)"}}>{label}</span>
   }
 
   disabledDate(current) {
@@ -1348,7 +1359,7 @@ class Reserve extends Component {
     if(current) {
       if(this.state.reserveDateList && this.state.reserveDateList.length) {
         this.state.reserveDateList.forEach(el => {
-          let reserveDate = new Date(moment(el.label));
+          let reserveDate = new Date(moment(el.calendarYmd));
           let reserveTime = reserveDate.getFullYear() + "-" + reserveDate.getMonth() + "-" + reserveDate.getDate();
           let currentDate = new Date(current);
           let currentTime = currentDate.getFullYear() + "-" + currentDate.getMonth() + "-" + currentDate.getDate();
