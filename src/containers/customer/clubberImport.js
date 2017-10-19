@@ -227,7 +227,6 @@ class ClubberImport extends Component {
                 </FormItem>
               </Col>
             </Row>
-            {this.getOrgList()}
           </div>
           <div style={{marginTop: "10px"}}>
             <Row>

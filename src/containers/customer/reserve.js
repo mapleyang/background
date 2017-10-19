@@ -74,7 +74,8 @@ class Reserve extends Component {
       staffType: "staff",
       groupValue: [],
       groupList: [],
-      reserveFlag: ""
+      reserveFlag: "",
+      currentServiceDate: moment(new Date(), "YYYYMMDD")
     }
   }
 
@@ -239,6 +240,9 @@ class Reserve extends Component {
             appointServiceTime: "",
             sendRmdKbn: "0"
           }
+          _this.setState({
+            currentServiceDate: moment(new Date(), 'YYYY-MM-DD')
+          })
           _this.props.form.setFieldsValue(initInfo)
         }, 100)
       }
@@ -283,6 +287,9 @@ class Reserve extends Component {
             appointServiceTime: record.appointServiceDate !== null ? moment(record.appointServiceDate, 'YYYY-MM-DD') : "",
             sendRmdKbn: record.sendMailKbn
           }
+          _this.setState({
+            currentServiceDate: record.appointServiceDate !== null ? moment(record.appointServiceDate, 'YYYY-MM-DD') : moment(new Date(), 'YYYY-MM-DD'),
+          })
           _this.props.form.setFieldsValue(initInfo)
         }, 100);
       }
@@ -298,6 +305,9 @@ class Reserve extends Component {
         appointServiceTime: moment(record.appointServiceDate, 'YYYY-MM-DD'),
         sendRmdKbn: "0"
       }
+      _this.setState({
+        currentServiceDate: record.appointServiceDate !== null ? moment(record.appointServiceDate, 'YYYY-MM-DD') : "",
+      })
       this.props.form.setFieldsValue(initInfo);
     }
     else if(flag === "cancel"){
@@ -503,7 +513,7 @@ class Reserve extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         let data = {
-          appointServiceDate: moment(values.appointServiceTime._d).format("YYYYMMDD"),
+          appointServiceDate: moment(this.state.currentServiceDate._d).format("YYYYMMDD"),
           sendRmdKbn: values.sendRmdKbn,
           hcuInstitutionId: values.hcuInstitutionId,
           parplmId: values.areaValue[0],
@@ -1322,7 +1332,7 @@ class Reserve extends Component {
                 label="服务日期">  
                   {getFieldDecorator('appointServiceTime')( 
                   <div className="table-calendar" style={{ width: 400, border: '1px solid #d9d9d9', borderRadius: 4 }}>
-                    <Calendar fullscreen={false} dateCellRender={this.dateCellRender.bind(this)} disabledDate={this.disabledDate.bind(this)} />
+                    <Calendar fullscreen={false} value={this.state.currentServiceDate} onSelect={this.serviceDateSelect.bind(this)} dateCellRender={this.dateCellRender.bind(this)} disabledDate={this.disabledDate.bind(this)} />
                   </div> 
                   )}             
               </FormItem>
@@ -1334,6 +1344,12 @@ class Reserve extends Component {
       </Form>
     </div>
     return item;
+  }
+
+  serviceDateSelect (value) {
+    this.setState({
+      currentServiceDate: value
+    })
   }
 
   dateCellRender(current) {
