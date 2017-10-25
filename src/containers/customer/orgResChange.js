@@ -65,7 +65,8 @@ class OrgResChange extends Component {
       serviceList: [],
       serviceValue: "",
       reserveRangeDate: [],
-      psc: ""
+      psc: "",
+      pageSize: 10,
     }
     this.columns = ClubberDetail.getOrgResChangeItem(this)
   }
@@ -136,7 +137,7 @@ class OrgResChange extends Component {
     this.setState({
       tableLoading: true
     })
-    groupOrgData.pageSize = 10;
+    groupOrgData.pageSize = groupOrgData.pageSize ? groupOrgData.pageSize : this.state.pageSize;
     let groupOrgUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarModify/searchData";
     Operate.getResponse(groupOrgUrl, groupOrgData, "POST", "html").then((value) => {
       if(value.success === "true") {
@@ -216,7 +217,7 @@ class OrgResChange extends Component {
       custPscId : record.custPscId,                 // 客户所购服务周期ID
       hospitalId : record.hcuInstitutionsId,         // 体检机构ID
       pageNumber: 1,
-      pageSize: 8
+      pageSize: this.state.pageSize
     }
     this.getGroupOrgDetailReq(record, groupOrgdetailData)
   }
@@ -561,22 +562,22 @@ class OrgResChange extends Component {
   } 
 
   /*表格保存事件*/
-  tableSaveClick (record, index) {
+  tableSaveClick () {
     const _this = this;
     let saveUrl = "/chealth/background/cusServiceOperation/hcuInstitutionCalendarModify/saveEdit";
-    let itemData = this.state.data[index];
-    itemData.groupHcuFlg = itemData.groupHcuFlg.toString();
-    let jsonList = JSON.stringify([itemData]);
+    // let itemData = this.state.data;
+    // itemData.groupHcuFlg = itemData.groupHcuFlg.toString();
+    let jsonList = JSON.stringify(this.state.data);
     let saveData = {
       jsonList: jsonList
     }
     Operate.getResponse(saveUrl, saveData, "POST", "html").then((value) => {
       if(value.success === "true") {
-        message.success(record.hcuInstitutionsName + "修改保存成功！");
+        message.success("修改保存成功！");
         _this.getGroupOrgInfo(this.state.condition);
       }
       else {
-        message.error(record.hcuInstitutionsName + "修改保存失败！")
+        message.error("修改保存失败！")
       }
     }, (value) => {})
   }
@@ -592,6 +593,15 @@ class OrgResChange extends Component {
       condition: data,
       reserveRangeDate: date
     })
+  }
+
+  onShowSizeChange(current, pageSize) {
+    this.setState({
+      pageSize: pageSize
+    })
+    let data = this.state.condition;
+    data.pageSize = pageSize;
+    this.getGroupOrgInfo(data);
   }
 
   render() {
@@ -686,7 +696,10 @@ class OrgResChange extends Component {
               dataSource={this.state.data} 
               size="middle"
               onChange={this.groupOrgTableChange}
-              pagination={{pageSize: 10, total: this.state.groupOrgTotal, size: "middle"}}  />
+              pagination={{ total: this.state.groupOrgTotal, size: "middle", showSizeChanger: true, onShowSizeChange: this.onShowSizeChange.bind(this)}}  />
+              <div className="table-operate-save">
+                <Button type="primary" onClick={this.tableSaveClick.bind(this)}>保存</Button>
+              </div>
           </div>
         </div>
         <Modal

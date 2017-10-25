@@ -467,17 +467,19 @@ const UserDetail = {
           <Checkbox checked={record.groupHcuFlg === "1"} onChange={_this.groupHcuFlgChange.bind(_this, record, index)}>团检日</Checkbox>
         </div>
       }
-    }, {
-      title: '操作',
-      dataIndex: 'operate',
-      key: 'operate',
-      width: 100,
-      render: (text, record, index) => {
-        return <div className="org-change-operate">
-          <Button type="primary" onClick={_this.tableSaveClick.bind(_this, record, index)}>保存</Button>
-        </div>
-      }
-    }]
+    }, 
+    // {
+    //   title: '操作',
+    //   dataIndex: 'operate',
+    //   key: 'operate',
+    //   width: 100,
+    //   render: (text, record, index) => {
+    //     return <div className="org-change-operate">
+    //       <Button type="primary" onClick={_this.tableSaveClick.bind(_this, record, index)}>保存</Button>
+    //     </div>
+    //   }
+    // }
+    ]
   },
   getGroupOrgDetailItem: () => {
     return [{

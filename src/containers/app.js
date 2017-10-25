@@ -24,13 +24,6 @@ export default class App extends Component {
   getHeader () {
     let header = "";
     header = <Header setModle={this.setModle.bind(this)} />
-    // let flag = location.hash.indexOf("#/mobile");
-    // let pathname = "";
-    // if(flag === 0) {
-    //   pathname = "mobile";
-    // }
-    // else {
-    // }
     return header;
   }
 

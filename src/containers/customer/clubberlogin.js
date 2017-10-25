@@ -333,12 +333,6 @@ class ClubberLogin extends Component {
     }
   }
 
-              // <FormItem
-              //   {...modalItemLayout}
-              //   label="产品服务">    
-              //   <span>{serviceName}</span>
-              // </FormItem>
-
   /*用户新增与编辑*/
   getUserAddEdit () {
     let item = "";
