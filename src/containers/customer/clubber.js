@@ -119,6 +119,7 @@ class Clubber extends Component {
         reqData[key] = data[key];
       }
     }
+    reqData.pageOrder = "asc";
     let clubberUrl = "/chealth/background/cusServiceOperation/memberInfo/searchData";
     Operate.getResponse(clubberUrl, reqData, "POST", "html").then((clubber) => {
       if(clubber.success === "true") {
