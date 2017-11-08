@@ -334,7 +334,6 @@ class ClubberLogin extends Component {
   }
 
   effectFlgChange (e) {
-    console.log(e.target.value)
     this.setState({
       effectFlgLot: e.target.value
     })
@@ -433,11 +432,14 @@ class ClubberLogin extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="登陆权限禁用"> 
-                  {getFieldDecorator('effectFlg')(
+                label="登陆权限禁用"
+                hasFeedback> 
+                  {getFieldDecorator('effectFlg', {
+                    rules: [{ required: true, message: '请选择是否禁用' }],
+                  })(
                     <RadioGroup>
-                      <Radio value={1}>是</Radio>
-                      <Radio value={2}>否</Radio>
+                      <Radio value={0}>是</Radio>
+                      <Radio value={1}>否</Radio>
                     </RadioGroup>
                   )}                  
               </FormItem>
@@ -452,8 +454,6 @@ class ClubberLogin extends Component {
   }
 
   onAreaChange = (value, selectedOptions) => {
-    console.log(selectedOptions);
-    console.log(value);
     this.setState({
       inputValue: selectedOptions.map(o => o.label).join(', '),
     });
@@ -718,8 +718,8 @@ class ClubberLogin extends Component {
             {...modalItemLayout}
             label="用户账号禁用"> 
             <RadioGroup onChange={this.effectFlgChange.bind(this)}>
-              <Radio value={1}>是</Radio>
-              <Radio value={2}>否</Radio>
+              <Radio value={0}>是</Radio>
+              <Radio value={1}>否</Radio>
             </RadioGroup>
           </FormItem>
         </Col>
@@ -761,41 +761,47 @@ class ClubberLogin extends Component {
     let userBathUrl = "/chealth/background/cusServiceOperation/memberLogin/saveEditLot";
     let data = {}
     data.cusId = this.state.cusId;
-    if(this.state.selectedRowKeys !== "" && this.state.selectedRows.length > 0) {
-      data.memberIds = this.state.selectedRowKeys;
+    if(this.state.selectedRowKeys !== "") {
+      data.memberIds = this.state.selectedRowKeys.toString();
       if(this.state.effectFlgLot !== "") {
-        data.effectFlgs = this.state.effectFlgLot;
+        data.effectFlg = this.state.effectFlgLot;
       }
-      if(this.state.startDate !== "" & this.state.endDate !== "") {
-        data.loginStartDates = this.state.startDate;
+      if(this.state.startDate !== "" && this.state.endDate !== "") {
+        data.loginStartDate = this.state.startDate;
         data.loginEndDate = this.state.endDate;
-        Operate.getResponse(userBathUrl, data, "POST", "html").then((value) => {
-          if(value.success === "true") {
-            this.setState({
-              userBathVisible: false
-            })
-            message.success('批量操作成功！');
-          }
-          else {
-            message.error('批量操作失败！');
-          }
-        }, (value) => {})
       }
       else {
-        message.warning('请完整填写起始和截至日期');
+        if(this.state.startDate !== "" || this.state.endDate !== "") {
+          message.warning('请完整填写起始和截至日期');
+        }
       }
+      this.userBathReq(userBathUrl, data);
     }
     else {
        message.warning('请选择操作的用户');
     }
   }
 
+  userBathReq (userBathUrl, data) {
+    const _this = this;
+    Operate.getResponse(userBathUrl, data, "POST", "html").then((value) => {
+      if(value.success === "true") {
+        _this.setState({
+          userBathVisible: false
+        })
+        _this.getClubberInfo(_this.state.condition);
+        message.success('批量操作成功！');
+      }
+      else {
+        message.error('批量操作失败！');
+      }
+    }, (value) => {})
+  }
+
   render() {
     let uploadUrl = "/chealth/background/cusServiceOperation/memberInfo/inputMemberData";
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-        console.log(selectedRowKeys.length)
         this.setState({
           selectedRowKeys: selectedRowKeys
         })
