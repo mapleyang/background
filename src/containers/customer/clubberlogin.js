@@ -56,6 +56,11 @@ class ClubberLogin extends Component {
       psc: "",
       staffType: "staff",
       staffAccount: "",
+      userBathVisible: false,
+      effectFlgLot: "",
+      startDate: "",
+      endDate: "",
+      selectedRowKeys: "",
     }
     this.columns = ClubberDetail.getUserColumns(this, "clubberLogin")
   }
@@ -105,8 +110,13 @@ class ClubberLogin extends Component {
     let clubberUrl = "/chealth/background/cusServiceOperation/memberInfo/searchData";
     Operate.getResponse(clubberUrl, data, "POST", "html").then((clubber) => {
       if(clubber.success === "true") {
+        let rows = [];
+        rows = clubber.data.rows.map((value, index) => {
+          value.key = value.memberId;
+          return value
+        })
         _this.setState({
-          data: clubber.data.rows,
+          data: rows,
           total: clubber.data.total,
         })
       }
@@ -268,6 +278,8 @@ class ClubberLogin extends Component {
             data[key] = values[key];
           }
         }
+        data.loginStartDate = moment(values.loginStartDate._d).format("YYYYMMDD");
+        data.loginEndDate = moment(values.loginEndDate._d).format("YYYYMMDD");
         data.memberId = this.state.detailData.memberId;
         data.cusId = this.state.detailData.cusId;
         data.memberName = this.state.detailData.name;
@@ -308,6 +320,7 @@ class ClubberLogin extends Component {
   handleCancel = (e) => {
     this.setState({
       addEditVisible: false,
+      userBathVisible: false
     });
   }
 
@@ -320,8 +333,11 @@ class ClubberLogin extends Component {
     });
   }
 
-  effectFlgChange (value) {
-
+  effectFlgChange (e) {
+    console.log(e.target.value)
+    this.setState({
+      effectFlgLot: e.target.value
+    })
   }
   //再次确认密码
   checkPassword = (rule, value, callback) => {
@@ -391,12 +407,35 @@ class ClubberLogin extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="登陆权限禁用"
-                hasFeedback> 
-                  {getFieldDecorator('effectFlg', {
-                    rules: [{ required: true }],
+                label="起始日期"
+                hasFeedback>                  
+                  {getFieldDecorator('loginStartDate', {
+                    rules: [{ required: true, message: '请选择起始日期' }],
                   })(
-                    <RadioGroup onChange={this.effectFlgChange.bind(this)}>
+                    <DatePicker placeholder="请选择起始日期" />
+                  )}
+              </FormItem>
+            </Col>
+            <Col span={12}>
+              <FormItem
+                {...modalItemLayout}
+                label="截至日期"
+                hasFeedback>                  
+                  {getFieldDecorator('loginEndDate', {
+                    rules: [{ required: true, message: '请选择截至日期' }],
+                  })(
+                    <DatePicker placeholder="请选择截至日期" />
+                  )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <FormItem
+                {...modalItemLayout}
+                label="登陆权限禁用"> 
+                  {getFieldDecorator('effectFlg')(
+                    <RadioGroup>
                       <Radio value={1}>是</Radio>
                       <Radio value={2}>否</Radio>
                     </RadioGroup>
@@ -665,8 +704,106 @@ class ClubberLogin extends Component {
     })
   }
 
+  userBathOperate () {
+    this.setState({
+      userBathVisible: true
+    })
+  }
+
+  getUserBathForm () {
+    return <div>
+      <Row>
+        <Col span={12}>
+          <FormItem
+            {...modalItemLayout}
+            label="用户账号禁用"> 
+            <RadioGroup onChange={this.effectFlgChange.bind(this)}>
+              <Radio value={1}>是</Radio>
+              <Radio value={2}>否</Radio>
+            </RadioGroup>
+          </FormItem>
+        </Col>
+        <Col span={12}>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={12}>
+           <FormItem
+            {...modalItemLayout}
+            label="账号起始日期">  
+            <DatePicker onChange={this.startChange.bind(this)} />
+          </FormItem>
+        </Col>
+        <Col span={12}>
+           <FormItem
+            {...modalItemLayout}
+            label="账号截至日期">  
+            <DatePicker onChange={this.endChange.bind(this)} />
+          </FormItem>
+        </Col>
+      </Row>
+    </div>
+  }
+
+  startChange (date, dateString) {
+    this.setState({
+      startDate: moment(dateString).format("YYYYMMDD")
+    })
+  }
+
+  endChange (date, dateString) {
+    this.setState({
+      endDate: moment(dateString).format("YYYYMMDD")
+    })
+  }
+
+  userBathHandle = (e) => {
+    let userBathUrl = "/chealth/background/cusServiceOperation/memberLogin/saveEditLot";
+    let data = {}
+    data.cusId = this.state.cusId;
+    if(this.state.selectedRowKeys !== "" && this.state.selectedRows.length > 0) {
+      data.memberIds = this.state.selectedRowKeys;
+      if(this.state.effectFlgLot !== "") {
+        data.effectFlgs = this.state.effectFlgLot;
+      }
+      if(this.state.startDate !== "" & this.state.endDate !== "") {
+        data.loginStartDates = this.state.startDate;
+        data.loginEndDate = this.state.endDate;
+        Operate.getResponse(userBathUrl, data, "POST", "html").then((value) => {
+          if(value.success === "true") {
+            this.setState({
+              userBathVisible: false
+            })
+            message.success('批量操作成功！');
+          }
+          else {
+            message.error('批量操作失败！');
+          }
+        }, (value) => {})
+      }
+      else {
+        message.warning('请完整填写起始和截至日期');
+      }
+    }
+    else {
+       message.warning('请选择操作的用户');
+    }
+  }
+
   render() {
     let uploadUrl = "/chealth/background/cusServiceOperation/memberInfo/inputMemberData";
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        console.log(selectedRowKeys.length)
+        this.setState({
+          selectedRowKeys: selectedRowKeys
+        })
+      },
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User', // Column configuration not to be checked
+      }),
+    };
     return (
       <div className="right-content">
         <div className="group-user">
@@ -789,8 +926,10 @@ class ClubberLogin extends Component {
               loading={this.state.tableLoading}
               dataSource={this.state.data} 
               size="middle"
+              rowSelection={rowSelection}
               onChange={this.tableChange}
               pagination={{current: this.state.pageNumber ,pageSize: 10, total: this.state.total, size: "middle"}}  />
+            <Button type="primary" onClick={this.userBathOperate.bind(this)}>批量操作</Button>
           </div>
         </div>
         <Modal
@@ -801,6 +940,14 @@ class ClubberLogin extends Component {
           width={800}
         >
           {this.getUserAddEdit()}
+        </Modal>
+        <Modal
+          title={"对选择的" + this.state.selectedRowKeys.length + "个用户批量操作"}
+          visible={this.state.userBathVisible}
+          onOk={this.userBathHandle}
+          onCancel={this.handleCancel}
+          width={800}>
+          {this.getUserBathForm()}
         </Modal>
       </div>
     );

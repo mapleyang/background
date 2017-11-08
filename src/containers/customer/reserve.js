@@ -552,13 +552,16 @@ class Reserve extends Component {
           if(this.state.addPayHcuPackageDtoList.length) {
             data.addPayHcuPackageDtoList = this.state.addPayHcuPackageDtoList;
           }
+          if(this.state.detailData.recordId !== undefined && this.state.detailData.recordId !== null) {
+            data.purchaseOrderId = this.state.detailData.recordId
+          }
         }
         this.reserveFormFuc(data);
       }
     });
   }
 
-  reserveHandleCancel = (e) => {
+  reserveHandleCancel = (e) => { 
     this.setState({
       reserveVisible: false
     })

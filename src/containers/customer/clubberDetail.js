@@ -52,20 +52,22 @@ const UserDetail = {
     return value
   },
   getUserColumns: (_this, flag) => {
-    let columns = [{
-      title: '项目名称',
-      dataIndex: 'code',
-      key: 'code',
-      render: (text, record, index) => {
-        let projectName = "";
-        _this.state.projectData.forEach(el => {
-          if(el.custProjectId === record.custProjectId) {
-            projectName = el.projectName;
-          }
-        })
-        return <span>{projectName}</span>
-      }
-    }, {
+    let columns = [
+    // {
+    //   title: '项目名称',
+    //   dataIndex: 'code',
+    //   key: 'code',
+    //   render: (text, record, index) => {
+    //     let projectName = "";
+    //     _this.state.projectData.forEach(el => {
+    //       if(el.custProjectId === record.custProjectId) {
+    //         projectName = el.projectName;
+    //       }
+    //     })
+    //     return <span>{projectName}</span>
+    //   }
+    // }, 
+    {
       title: '用户姓名',
       dataIndex: 'name',
       key: 'name',
@@ -94,6 +96,14 @@ const UserDetail = {
       title: '手机号',
       key: 'mobile',
       dataIndex: "mobile"
+    },{
+      title: '起始日期',
+      key: 'loginStartDate',
+      dataIndex: "loginStartDate"
+    },{
+      title: '截至日期',
+      key: 'loginEndDate',
+      dataIndex: "loginEndDate"
     },{
       title: '账号状态',
       key: 'accountStatus',
@@ -343,7 +353,7 @@ const UserDetail = {
             operateItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "change", record, index)}><a>改约</a></span>
           }
           else if(record.serviceStatus === "未开始") {
-            operateItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "continue")}><a>预约</a></span>
+            operateItem = <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "continue")}><a>继续预约</a></span>
           }
           return <span className="table-operate">
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
