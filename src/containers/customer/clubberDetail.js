@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Form, Row, Col, Select, InputNumber, Button, Checkbox, Icon} from 'antd'
 const FormItem = Form.Item;
 const Option = Select.Option;
+import moment from 'moment';
 const modalItemLayout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 10 },
@@ -48,6 +49,12 @@ const UserDetail = {
     },{
       label: "角色/职位",
       value: data.workPositionName
+    },{
+      label: "起始日期",
+      value: data.loginStartDate
+    },{
+      label: "截止日期",
+      value: data.loginEndDate
     }];
     return value
   },
@@ -99,11 +106,25 @@ const UserDetail = {
     },{
       title: '起始日期',
       key: 'loginStartDate',
-      dataIndex: "loginStartDate"
+      dataIndex: "loginStartDate",
+      render: (text, record, index) => {
+        let value = "";
+        if(text !== null && text !== undefined) {
+          value = moment(text).format("YYYY-MM-DD");
+        }
+        return <span>{value}</span>
+      },
     },{
       title: '截至日期',
       key: 'loginEndDate',
-      dataIndex: "loginEndDate"
+      dataIndex: "loginEndDate",
+      render: (text, record, index) => {
+        let value = "";
+        if(text !== null && text !== undefined) {
+          value = moment(text).format("YYYY-MM-DD");
+        }
+        return <span>{value}</span>
+      },
     },{
       title: '账号状态',
       key: 'accountStatus',
