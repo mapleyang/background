@@ -188,7 +188,9 @@ class ClubberLogin extends Component {
       let initData = {
         password: "",
         passwordNew: "",
-        effectFlg: ""
+        effectFlg: "",
+        loginStartDate: record.loginStartDate ? moment(moment(record.loginStartDate).format("YYYY-MM-DD"), "YYYY-MM-DD") : "",
+        loginEndDate: record.loginEndDate ? moment(moment(record.loginEndDate).format("YYYY-MM-DD"), "YYYY-MM-DD") : ""
       }
       this.props.form.setFieldsValue(initData)
       let userDetailUrl = "/chealth/background/cusServiceOperation/memberLogin/edit";
@@ -706,7 +708,10 @@ class ClubberLogin extends Component {
 
   userBathOperate () {
     this.setState({
-      userBathVisible: true
+      userBathVisible: true,
+      startDate: "",
+      endDate: "",
+      effectFlgLot: ""
     })
   }
 
