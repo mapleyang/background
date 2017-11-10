@@ -434,11 +434,8 @@ class ClubberLogin extends Component {
             <Col span={12}>
               <FormItem
                 {...modalItemLayout}
-                label="登陆权限禁用"
-                hasFeedback> 
-                  {getFieldDecorator('effectFlg', {
-                    rules: [{ required: true, message: '请选择是否禁用' }],
-                  })(
+                label="登陆权限禁用"> 
+                  {getFieldDecorator('effectFlg')(
                     <RadioGroup>
                       <Radio value={0}>是</Radio>
                       <Radio value={1}>否</Radio>

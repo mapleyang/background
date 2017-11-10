@@ -380,7 +380,7 @@ const UserDetail = {
             <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "detail", record, index)}><a>查看</a></span>
             {operateItem}
             { record.serviceStatus === "已取消" ? "" : <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "cancel", record, index)}><a>取消</a></span>}
-            { record.serviceStatus === "已取消" ? <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "continue")}><a>重新预约</a></span> : ""}
+            { record.serviceStatus === "已取消" ? <span className="table-operate-item" onClick={_this.operateClick.bind(_this, "reserve", record, index, "continue", "restart")}><a>重新预约</a></span> : ""}
           </span>
         },
       }]

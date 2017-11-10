@@ -75,6 +75,7 @@ class Reserve extends Component {
       groupValue: [],
       groupList: [],
       reserveFlag: "",
+      reserveFlagText: "",
       currentServiceDate: moment(new Date(), "YYYYMMDD")
     }
   }
@@ -187,11 +188,12 @@ class Reserve extends Component {
   }
 
   /*表格操作*/
-  operateClick (flag, record, index, reserveFlag) {
+  operateClick (flag, record, index, reserveFlag, reserveFlagText) {
     const _this = this;
     this.setState({
       operateType: flag,
-      reserveFlag: reserveFlag
+      reserveFlag: reserveFlag,
+      reserveFlagText: reserveFlagText ? reserveFlagText : ""
     })
     let provinceListData = {
       cusId: this.state.cusId,
@@ -540,6 +542,8 @@ class Reserve extends Component {
           data.staffMarital = values.staffMarital;
           data.staffMobile = values.staffMobile;
           data.staffEmail = values.staffEmail;
+          data.contactMobile = values.staffMobile;
+          data.contactEmail = values.staffEmail;
           if(this.state.addFreeHcuItemDtoList.length) {
             data.addFreeHcuItemDtoList = this.state.addFreeHcuItemDtoList;        
           }
@@ -552,7 +556,7 @@ class Reserve extends Component {
           if(this.state.addPayHcuPackageDtoList.length) {
             data.addPayHcuPackageDtoList = this.state.addPayHcuPackageDtoList;
           }
-          if(this.state.detailData.recordId !== undefined && this.state.detailData.recordId !== null) {
+          if(this.state.detailData.recordId !== undefined && this.state.detailData.recordId !== null && this.state.reserveFlagText !== "restart") {
             data.purchaseOrderId = this.state.detailData.recordId
           }
         }
