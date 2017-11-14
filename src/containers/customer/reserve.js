@@ -193,7 +193,7 @@ class Reserve extends Component {
     this.setState({
       operateType: flag,
       reserveFlag: reserveFlag,
-      reserveFlagText: reserveFlagText ? reserveFlagText : ""
+      reserveFlagText: reserveFlagText ? reserveFlagText : "",
     })
     let provinceListData = {
       cusId: this.state.cusId,

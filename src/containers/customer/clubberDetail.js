@@ -485,7 +485,7 @@ const UserDetail = {
       width: 100,
       render: (text, record, index) => {
         return <div className="org-change-operate">
-          <InputNumber min={0} defaultValue={record.reserveLimit} onChange={_this.reserveLimitChange.bind(_this, record, index)}/>
+          <InputNumber min={0} value={record.reserveLimit} onChange={_this.reserveLimitChange.bind(_this, record, index)}/>
         </div>
       }
     }, {

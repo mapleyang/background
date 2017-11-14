@@ -811,21 +811,6 @@ class Clubber extends Component {
     return item;
   }
 
-  // checkBirth = (rule, value, callback) => {
-  //   const form = this.props.form;
-  //   if (value && form.getFieldValue('birth') && form.getFieldValue('cardType') === "1") {
-  //     let date = new Date(form.getFieldValue('birth')._d);
-  //     console.log(date)
-  //     console.log(value.length)
-  //     if(value.length === 18) {
-        
-  //     }
-  //     callback('身份证号的生日信息请与生日信息一致');
-  //   } else {
-  //     callback();
-  //   }
-  // }
-
   onAreaChange = (value, selectedOptions) => {
     console.log(selectedOptions);
     console.log(value);
