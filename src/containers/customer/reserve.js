@@ -1339,7 +1339,13 @@ class Reserve extends Component {
                 label="服务日期">  
                   {getFieldDecorator('appointServiceTime')( 
                   <div className="table-calendar" style={{ width: 400, border: '1px solid #d9d9d9', borderRadius: 4 }}>
-                    <Calendar fullscreen={false} value={this.state.currentServiceDate} onSelect={this.serviceDateSelect.bind(this)} dateCellRender={this.dateCellRender.bind(this)} disabledDate={this.disabledDate.bind(this)} />
+                    <Calendar 
+                      fullscreen={false} 
+                      value={this.state.currentServiceDate} 
+                      onSelect={this.serviceDateSelect.bind(this)} 
+                      dateCellRender={this.dateCellRender.bind(this)} 
+                      onPanelChange={this.onPanelChange.bind(this)}
+                      disabledDate={this.disabledDate.bind(this)} />
                   </div> 
                   )}             
               </FormItem>
@@ -1351,6 +1357,12 @@ class Reserve extends Component {
       </Form>
     </div>
     return item;
+  }
+
+  onPanelChange (value, mode) {
+    this.setState({
+      currentServiceDate: value
+    })
   }
 
   serviceDateSelect (value) {
