@@ -577,7 +577,12 @@ class OrgResChange extends Component {
         _this.getGroupOrgInfo(this.state.condition);
       }
       else {
-        message.error("修改保存失败！")
+        if(value.errors && value.errors.length !== 0 && value.errors[0].errorMessage) {
+          message.error(value.errors[0].errorMessage)
+        }
+        else {
+          message.error("修改保存失败！")
+        }
       }
     }, (value) => {})
   }
